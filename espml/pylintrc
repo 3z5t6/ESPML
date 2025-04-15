@@ -1,0 +1,75 @@
+# espml/pylintrc
+# 启动时使用 pylint --generate-rcfile > pylintrc 生成基础配置
+
+[MASTER]
+# 加载插件以支持常用库 (例如 Pydantic, Scikit-learn 等，如果使用)
+# load-plugins=
+
+# 使用所有可用检查器
+enable=all
+
+# 考虑禁用的检查 (谨慎禁用，仅当确实干扰或不适用时)
+disable=
+    missing-module-docstring, # 模块文档字符串 (建议后续添加)
+    missing-class-docstring,  # 类文档字符串 (强制要求)
+    missing-function-docstring, # 函数文档字符串 (强制要求)
+    invalid-name,             # 允许部分常用短变量名 (如 i, j, k, df, _, e, ax)，但需谨慎
+    fixme,                    # 允许 FIXME/TODO 注释
+    logging-fstring-interpolation, # Loguru 通常使用 .format() 或 {}
+    too-many-locals,          # 局部变量过多 (按需放宽阈值, 默认 15)
+    too-many-arguments,       # 函数参数过多 (按需放宽阈值, 默认 5)
+    too-many-instance-attributes, # 实例属性过多 (按需放宽阈值, 默认 7)
+    too-few-public-methods,   # 公共方法过少 (按需放宽阈值, 默认 2)
+    redefined-outer-name,     # 允许在循环或 try/except 中重新定义外部变量 (有时难以避免)
+    import-outside-toplevel,  # 允许在函数内部导入 (有时为了延迟加载或避免循环导入)
+    line-too-long             # 行过长 (通过代码格式化工具 black 处理)
+
+[MESSAGES CONTROL]
+# 可以在这里精细控制 specific message IDs
+
+[FORMAT]
+# 最大行长度 (建议使用 black 等工具自动管理)
+max-line-length=120
+# 最大模块行数
+max-module-lines=1000 # 按需调整
+
+[BASIC]
+# 强制要求 Google 风格的 docstrings
+docstring-style=google
+# 变量名正则表达式 (允许小写下划线或驼峰)
+# variable-rgx=[a-z_][a-z0-9_]{2,30}$
+# 常量名正则表达式 (强制大写下划线)
+const-rgx=(([A-Z_][A-Z0-9_]*)|(__.*__))$
+# 类名正则表达式 (强制驼峰)
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+# 函数名正则表达式 (强制小写下划线)
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+# 方法名正则表达式 (强制小写下划线)
+method-rgx=[a-z_][a-z0-9_]{2,30}$
+# 参数名正则表达式 (强制小写下划线)
+argument-rgx=[a-z_][a-z0-9_]{2,30}$
+
+[TYPECHECK]
+# 启用类型检查相关警告
+# ignore-mixin-members=yes
+# ignored-classes= # (例如 SQLalchemy base classes)
+# generated-members= # (例如 Pydantic fields)
+
+[DESIGN]
+# 最大分支数 (函数复杂度)
+max-branches=15 # 按需调整
+# 最大语句数 (函数长度)
+max-statements=50 # 按需调整
+# 最大父类数
+max-parents=7
+# 最大嵌套深度
+max-depth=5
+
+[LINT]
+# 报告中包含 message id
+reports=yes
+# 输出格式
+output-format=colorized
+
+# 启用更多检查?
+# enable=useless-suppression,deprecated-pragma,use-symbolic-message-instead

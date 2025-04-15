@@ -1,0 +1,295 @@
+# espml/espml/project/WindPower/task_config.yaml
+# 任务配置文件 (espml)
+
+# --- 任务列表 ---
+# 定义所有需要执行的预测、训练、回测任务
+# 每个任务是一个独立的配置单元
+tasks:
+  # --- 短期预测任务 (4小时) ---
+  - task_id: Forecast4Hour
+    description: "未来 4 小时功率预测任务"
+    enabled: true # 是否启用此任务
+
+    type: forecast # 任务类型: forecast (实时预测) 或 backtrack (历史回测)
+    forecast_horizon: 4H # 预测时长 (Pandas Freq String 或类似 '4H', '1D')
+    output_freq: "15min" # 输出预测结果的时间频率 (应等于 Feature.TimeFrequency)
+
+    # 触发器配置 (用于自动化调度)
+    # train_trigger: "cron(5 0,4,8,12,16,20 * * ? *)" # AWS EventBridge / CloudWatch 格式?
+    # predict_trigger: "cron(10 0,4,8,12,16,20 * * ? *)"
+    # 或者简单的 Crontab 格式 (用于 yaml2crontab.py)
+    train_trigger_cron: "5 0,4,8,12,16,20 * * *" # Crontab 格式: 分 时 日 月 周
+    predict_trigger_cron: "10 0,4,8,12,16,20 * * *"
+
+    # 数据获取与窗口配置 (相对于任务触发时间)
+    data_fetch_lag: "15min" # 最新可用数据相对于当前时间的延迟
+    # 训练数据窗口
+    train_start_offset: "-90D" # 使用过去 90 天的数据进行训练 (Pandas Offset String)
+    train_end_offset: "-1H"   # 训练数据截止到触发时间前 1 小时
+    # 预测所需输入数据窗口 (通常包含滞后特征所需的最大历史长度)
+    predict_input_start_offset: "-2D" # 需要过去 2 天的数据来计算滞后/滚动特征
+    predict_input_end_offset: "0H"   # 截止到当前触发时间
+
+    # 覆盖全局配置 (可选)
+    config_override:
+      IncrML:
+        Enabled: true # 强制启用增量学习
+        SaveModelPath: data/model/Forecast4Hour # 指定此任务的模型路径
+      AutoML:
+        TimeBudget: 600 # 增加 AutoML 时间预算至 600 秒
+      # Feature:
+      #   CapacityKW: 110000.0 # 如果此任务对应不同容量
+
+  # --- 日前预测任务 (1天) ---
+  - task_id: Forecast1Day
+    description: "未来 1 天功率预测任务 (日前)"
+    enabled: true
+    type: forecast
+    forecast_horizon: 1D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"  # 每天 07:15 训练
+    predict_trigger_cron: "20 7 * * *" # 每天 07:20 预测
+    data_fetch_lag: "2H" # 日前数据延迟可能更大
+    train_start_offset: "-180D" # 使用更长的历史数据
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast1Day
+      AutoML:
+        TimeBudget: 1800 # 更长的时间预算
+
+  # --- 其他预测任务 (2天 到 11天) ---
+  # 结构类似 Forecast1Day，调整 task_id, description, forecast_horizon, triggers, offsets, SaveModelPath
+  - task_id: Forecast2Day
+    description: "未来 2 天功率预测任务"
+    enabled: true # 根据实际需要启用
+    type: forecast
+    forecast_horizon: 2D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *" # 触发时间与 1Day 不同或相同
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast2Day
+      AutoML:
+        TimeBudget: 1800
+
+  # ... (Forecast3Day 到 Forecast11Day 的重复结构) ...
+  - task_id: Forecast3Day
+    description: "未来 3 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 3D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast3Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast4Day
+    description: "未来 4 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 4D
+    output_freq: "15min"  
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast4Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast5Day
+    description: "未来 5 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 5D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"  
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast5Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast6Day
+    description: "未来 6 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 6D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast6Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast7Day
+    description: "未来 7 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 7D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast7Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast8Day
+    description: "未来 8 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 8D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast8Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast9Day
+    description: "未来 9 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 9D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast9Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast10Day
+    description: "未来 10 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 10D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast10Day
+      AutoML:
+        TimeBudget: 1800
+  - task_id: Forecast11Day
+    description: "未来 11 天功率预测任务"
+    enabled: true
+    type: forecast
+    forecast_horizon: 11D
+    output_freq: "15min"
+    train_trigger_cron: "15 7 * * *"
+    predict_trigger_cron: "20 7 * * *"
+    data_fetch_lag: "2H"
+    train_start_offset: "-180D"
+    train_end_offset: "-2H"
+    predict_input_start_offset: "-3D"
+    predict_input_end_offset: "0H"
+    config_override:
+      IncrML:
+        SaveModelPath: data/model/Forecast11Day
+      AutoML:
+        TimeBudget: 1800
+  # 需要为每个 horizon (3D, 4D, ..., 11D) 添加类似的条目，修改 task_id, description, forecast_horizon, SaveModelPath
+  # 触发时间、数据窗口、AutoML预算等可根据实际需求调整或保持一致
+
+  # --- 回测任务示例 (1天预测的回测) ---
+  - task_id: Backtrack1Day
+    description: "日前 1 天功率预测回测任务"
+    enabled: true # 是否启用回测
+    type: backtrack
+
+    forecast_horizon: 1D   # 回测对应的预测时长
+    output_freq: "15min" # 回测结果的时间频率
+
+    # 回测执行触发器 (例如，每天早上跑一次昨天的回测)
+    backtrack_trigger_cron: "30 8 * * *" # 每天 08:30 触发回测任务
+
+    # 回测时间范围配置
+    backtrack_start_date: "2025-01-01" # 回测模拟的起始日期 (包含)
+    backtrack_end_date: "2025-01-10"   # 回测模拟的结束日期 (包含) - 从 pred 文件名推断
+    backtrack_time_of_day: "07:20:00" # 模拟每天进行预测的具体时间点 (应与对应 Forecast 任务的 predict_trigger 时间相关)
+
+    # 回测模型处理方式
+    backtrack_retrain: true # true: 每次回测都重新训练模型; false: 加载对应日期的预训练模型 (如果存在)
+    # 回测模型保存路径模式 (如果 backtrack_retrain=true 或 需要保存回测模型)
+    # 使用占位符 {date_YYYYMMDD} 和 {time_HHMM} (对应 backtrack_time_of_day)
+    backtrack_model_path_pattern: "data/model/Forecast1Day_backtrack/{date_YYYYMMDD}_{time_HHMM}"
+
+    # 回测时训练数据窗口 (相对于回测当天的 backtrack_time_of_day)
+    backtrack_train_start_offset: "-180D" # 同 Forecast1Day
+    backtrack_train_end_offset: "-2H"     # 同 Forecast1Day
+
+    # 回测时预测输入数据窗口 (相对于回测当天的 backtrack_time_of_day)
+    backtrack_predict_input_start_offset: "-3D" # 同 Forecast1Day
+    backtrack_predict_input_end_offset: "0H"    # 同 Forecast1Day
+
+    # 回测特定配置覆盖 (可选)
+    backtrack_config_override:
+      AutoML:
+        TimeBudget: 600 # 回测时可以减少 AutoML 预算以加快速度
+
+  # --- 其他回测任务 (4小时, 2天 到 11天) ---
+  # 结构类似 Backtrack1Day，调整 task_id, description, forecast_horizon,
+  # backtrack_time_of_day (可能不同), backtrack_model_path_pattern, offsets (如果不同)
+  # ... (省略 Backtrack4Hour, Backtrack2Day 到 Backtrack11Day 的重复结构) ...
+
+# --- 全局回测配置 (可选) ---
+# global_backtrack_config:
+#   default_start_date: "2025-01-01"
+#   default_end_date: "2025-03-31"
+#   default_retrain: true

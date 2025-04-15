@@ -1,0 +1,27 @@
+# espml/requirements.txt
+# 核心依赖
+pandas>=1.5.0,<2.0.0 # 数据处理核心
+numpy>=1.20.0        # 数值计算
+scikit-learn>=1.0.0  # 机器学习基础 (模型评估、数据划分等)
+pyyaml>=6.0          # YAML 配置解析
+loguru>=0.7.0        # 日志记录 (根据日志格式推断)
+flaml>=2.0.0         # AutoML 库 (根据日志推断)
+
+# 可能的依赖 (根据文件功能推断，待确认)
+joblib>=1.1.0        # 模型持久化 (常见选择)
+requests             # 如果有 API 数据源或结果上报
+psutil               # 系统资源监控 (可能用于日志或资源限制)
+schedule             # 如果任务调度不在 Crontab 而在 Python 内部
+# openpyxl           # 如果需要读写 Excel 格式的结果或数据源
+# pymysql / psycopg2 # 如果数据源是 MySQL / PostgreSQL
+
+# 测试依赖
+pytest>=7.0.0
+pytest-cov           # 测试覆盖率
+
+# 代码格式化与检查
+pylint>=2.14.0       # 静态代码分析
+black                # (推荐) 代码格式化工具
+mypy>=0.971          # 静态类型检查
+
+# 注意: 版本号需要根据实际情况和兼容性进行调整和锁定

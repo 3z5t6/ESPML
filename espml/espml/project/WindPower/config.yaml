@@ -1,0 +1,151 @@
+# --- 基本信息 ---
+AuthorName: Turing # 来自日志示例
+TaskName: shenhuadao # 来自日志示例, 风场或项目名称
+JobID: null       # 运行时由外部传入或生成, 来自日志示例 (e.g., 1703815748021)
+
+# --- 数据源配置 (DataSource) ---
+DataSource:
+  type: local_dir # 数据源类型, 示例: local_dir, database, api
+  dir: data/resource # 数据文件所在目录 (相对于项目根目录)
+
+  # 各数据文件的列名配置 (!!! 重要: 必须与实际 CSV 文件列名匹配 !!!)
+  # 使用 espml.util.const 中的 ORIG_* 常量对应的字符串值
+  FansTimeCol: "时间"
+  FansPowerCol: "实际功率"
+  TowerTimeCol: "时间"
+  TowerColRenameMap: # 列名 -> 内部标准列名 (见 const.py INTERNAL_*)
+    "风速": "Tower_WindSpeed"
+    "风向": "Tower_WindDirection"
+    "温度": "Tower_Temperature"
+    "气压": "Tower_Pressure"
+    "湿度": "Tower_Humidity"
+    # 添加其他测风塔列 (如果存在)
+    # "80m风速": "Tower_WindSpeed_80m"
+  WeatherIssueTimeCol: "时间"    # 天气预报发布时间列名
+  WeatherForecastTimeCol: "预报时间" # 天气预报目标时间列名
+  WeatherColRenameMap: # 列名 -> 内部标准列名
+    "风速": "Weather_WindSpeed"
+    "风向": "Weather_WindDirection"
+    "温度": "Weather_Temperature"
+    "气压": "Weather_Pressure"
+    "湿度": "Weather_Humidity"
+    # 添加其他天气预报列 (如果存在)
+    # "云量": "Weather_CloudCover"
+
+# --- 特征与目标配置 (Feature) ---
+Feature:
+  TaskType: regression                 # 任务类型: regression, classification
+  TargetName: "label"                  # 内部目标变量列名 (处理后生成)
+  TimeIndex: "datetime"                # 内部时间序列索引列名 (处理后生成)
+  TimeFormat: "%Y-%m-%d %H:%M:%S"      # 数据时间列解析格式 (需要与数据匹配!)
+  TimeFrequency: "15min"               # 目标时间频率 (例如 "15min", "1H") - !! 关键参数 !!
+                                       # 注意: 日志示例 TimeFrequency: '3' 不明确，假设是 '15min'需要核实!
+  CapacityKW: 100000.0               # 风电场额定容量 (单位: kW) - !! 关键参数，用于数据清洗 !!
+
+  # 需要从数据中忽略的列 (在加载后、特征工程前移除)
+  IgnoreFeature:
+    - ID      # 来自日志示例
+    - FARM_ID # 来自日志示例
+    # - 其他不需要的列名
+
+  # 显式指定的类别特征列名 (处理后的内部列名) - 若没有则为空列表
+  CategoricalFeature: []
+    # - Tower_WindDirection_Category # 示例 (如果风向不转为向量而是分箱)
+
+  # 分组信息 (用于交叉验证等，例如按风机 ID 分组) - 若无则为 null
+  GroupIndex: null
+
+  # 模型评估指标
+  Metric: rmse # 回归: rmse, mae, mape, r2; 分类: accuracy, f1, roc_auc
+
+  # 数据划分方式 (用于训练/验证集划分)
+  SplitType: null # null (默认按 TestSize 随机划分), TimeSeriesSplit, GroupKFold 等
+  TestSize: 0.2    # 如果 SplitType 为 null，指定测试集比例 (来自日志示例 TestSize: 0.25 ?) - 确认日志中的值
+                   # 注意: 日志中 TestSize=0.25，但下方 TimeWindow 可能暗示了时序划分?
+
+  # 特征工程 - 时间窗口相关参数 (含义需根据 data_process.py 确定)
+  # 日志示例 TimeWindow: '1,2,3' - 这通常用于滞后特征或滚动窗口
+  # 假设 '1,2,3' 指的是滞后期数 (相对于 TimeFrequency)
+  TimeWindowLags: [1, 2, 3, 4, 8] # 示例: 滞后 1, 2, 3, 4, 8 个时间步 (15m, 30m, 45m, 1h, 2h) - 需要根据原代码确认!
+  TimeWindowRolling: # 示例: 滚动窗口配置 - 需要根据原代码确认!
+    target: # 对目标变量 'label'
+      windows: [4, 8, 16] # 窗口大小 (单位: TimeFrequency 的步数), e.g., 1h, 2h, 4h
+      aggs: ['mean', 'std', 'min', 'max'] # 聚合函数
+    Tower_WindSpeed: # 对测风塔风速
+      windows: [4, 8]
+      aggs: ['mean', 'std']
+
+  # 数据抽样策略 (用于不平衡数据或大数据集)
+  Sampling: null # null, UnderSampling, OverSampling, SMOTE
+
+  # 是否绘制特征分析图表 (例如特征重要性)
+  Plot: False
+
+  # 全局随机种子
+  RandomSeed: 1024 # 来自日志示例
+
+# --- 数据清洗配置 (Cleaning) ---
+Cleaning:
+  # 缺失值插值方法
+  InterpolateMethod: time # 例如: time, linear, polynomial, nearest
+  InterpolateLimit: 3    # 限制连续插值的最大数量 (防止过长插值)
+  # 异常值处理方法 (需要根据原代码 data_process.py 的逻辑填写)
+  OutlierMethodPower: "PowerCurve" # 功率异常值处理: PowerCurve (使用风速过滤), Range (仅限幅)
+  OutlierMethodWindSpeed: "Range"   # 风速异常值处理: Range, IQR, ZScore
+  # 参数配置 (如果方法需要)
+  PowerCurveParams:
+    min_wind_speed: 3.0 # 切入风速 (m/s)
+    max_wind_speed: 25.0 # 切出风速 (m/s)
+    invalid_power_threshold_kw: 10.0 # 低风速/高风速下允许的非零功率阈值 (kW)
+  WindSpeedRangeParams:
+    min_value: 0.0
+    max_value: 50.0 # 风速物理上限 (m/s)
+
+# --- 自动特征工程 (AutoFE) ---
+AutoFE:
+  Running: True      # 是否启用 AutoFE (来自日志示例)
+  Method: DFS        # 使用的 AutoFE 算法: DFS, GBDT (来自日志示例)
+  DFSLayers: 4       # DFS 搜索层数 (来自日志示例)
+  maxTrialNum: 5     # AutoFE 尝试次数/生成的特征组数 (来自日志示例)
+  RandomRatio: 0.25  # DFS 中随机选择特征的比例 (来自日志示例)
+  FeatImpThreshold: 0.005 # 新特征被采纳的重要性阈值 (来自日志示例)
+  SaveFeatures: OnlyGreater # 保存哪些 AutoFE 生成的特征: All, OnlyGreater, None (来自日志示例)
+  port: 49155        # AutoFE 服务端口? (来自日志示例，可能与内部服务或库相关) - 需要确认其作用
+
+# --- 自动机器学习 (AutoML) ---
+AutoML:
+  Running: True      # 是否启用 AutoML (来自日志示例)
+  Method: flaml      # 使用的 AutoML 库: flaml, autosklearn (来自日志示例)
+  TimeBudget: 300    # AutoML 搜索时间预算 (秒) (来自日志示例)
+  # flaml 特定参数 (如果需要覆盖 flaml 默认值)
+  flaml_settings:
+    task: 'regression' # 任务类型 (应与 Feature.TaskType 一致)
+    metric: 'rmse'     # 评估指标 (应与 Feature.Metric 一致)
+    # estimator_list: ['lgbm', 'xgboost', 'rf', 'extra_tree'] # 候选模型列表 (可选)
+    # log_file_name: 'automl.log' # FLAML 自己的日志文件 (会被覆盖)
+    # seed: 1024 # 随机种子 (应与 Feature.RandomSeed 一致)
+
+# --- 增量学习 (IncrML) ---
+IncrML:
+  Enabled: True # !! 注意: 日志示例中 Incrml: False, 但用户要求包含此功能, 设为 True !!
+                 # !! 需要在 manager.py 中实现相应逻辑 !!
+  Method: iCaRL # 增量学习算法: iCaRL, LwF, GEM (来自日志示例 Method: 'iCaRL') - 需要确认实现
+  SaveModelPath: data/model # 基础模型保存路径 (会被 task_config.yaml 覆盖)
+  Trigger: OnDataFileIncrease # 触发增量学习的条件: OnDataFileIncrease, Scheduled, OnDriftDetected (来自日志示例)
+  # 概念漂移检测配置 (如果 Trigger 是 OnDriftDetected)
+  DriftDetection:
+    Enabled: False # 默认不启用，除非 Trigger 设置为 OnDriftDetected
+    Method: DDM    # 漂移检测算法: DDM, EDDM, ADWIN, PageHinkley
+    # 算法参数 (根据所选 Method 配置)
+    # DDM/EDDM params:
+    # WarningLevel: 2.0
+    # DriftLevel: 3.0
+    # ADWIN params:
+    # Delta: 0.002
+
+# --- 资源配置 (Resource) ---
+Resource:
+  trainingServicePlatform: local # 训练平台: local, k8s, yarn (日志示例)
+  # 本地资源限制 (可选)
+  # num_cores: 4 # 使用的 CPU 核心数
+  # memory_limit_gb: 8 # 内存限制 (GB)
