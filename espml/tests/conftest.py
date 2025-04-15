@@ -1,7 +1,7 @@
 # tests/conftest.py
 # -*- coding: utf-8 -*-
 """
-Pytest 配置文件，定义共享的 fixtures
+Pytest 配置文件,定义共享的 fixtures
 """
 from typing import Any, Dict
 import pytest
@@ -94,7 +94,7 @@ def espml_test_project(tmp_path: Path, fixtures_dir: Path, sample_config_dict: D
                     WindPower/
                         config.yaml
                         task_config.yaml
-            scripts/ (可选，如果需要运行脚本)
+            scripts/ (可选,如果需要运行脚本)
                 main.py
                 backtracking.py
                 ...
@@ -119,7 +119,7 @@ def espml_test_project(tmp_path: Path, fixtures_dir: Path, sample_config_dict: D
     shutil.copy(fixtures_dir / "sample_tower.csv", resource_dir / "tower.csv")
     shutil.copy(fixtures_dir / "sample_weather.csv", resource_dir / "weather.csv")
 
-    # 创建配置文件 (基于 fixture，但修改路径指向临时目录)
+    # 创建配置文件 (基于 fixture,但修改路径指向临时目录)
     config_data = sample_config_dict.copy()
     config_data['DataSource']['dir'] = str(resource_dir.relative_to(project_dir)) # 使用相对路径
     # 确保 IncrML 路径在临时目录下

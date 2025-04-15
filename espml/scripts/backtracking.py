@@ -57,12 +57,12 @@ def main():
     except Exception as log_e:
         print(f"错误初始化日志系统失败: {log_e}", file=sys.stderr)
         logger.remove(); logger.add(sys.stderr, level=args.log_level.upper())
-        logger.error("初始化文件日志失败，仅使用控制台输出")
+        logger.error("初始化文件日志失败,仅使用控制台输出")
 
     # 加载配置
     logger.info("开始加载配置...")
     full_config = load_and_merge_configs(args) # 复用 main.py 的函数
-    if full_config is None: logger.critical("无法加载配置，程序终止"); sys.exit(1)
+    if full_config is None: logger.critical("无法加载配置,程序终止"); sys.exit(1)
     logger.info("配置加载完成")
 
     # 解析回测日期范围
@@ -151,15 +151,15 @@ def main():
                  # 调用 runner.run 并传入覆盖时间
                  # WindTaskRunner 的 run 方法内部需要正确处理 current_time_override
                  # 并且能够根据 self.task_run_type == 'backtrack' 使用回测配置
-                 # 为了传递回测特定配置，可能需要修改 run 方法或在这里修改配置副本
-                 # 假设 WindTaskRunner.run 可以处理覆盖时间，但需要传递回测模式信息
+                 # 为了传递回测特定配置,可能需要修改 run 方法或在这里修改配置副本
+                 # 假设 WindTaskRunner.run 可以处理覆盖时间,但需要传递回测模式信息
                  # 或者直接修改 WindTaskRunner.__init__ 使其接收 task_config
 
-                 # 简洁方案在 runner 内部判断是否为回测模式？不，入口处判断更清晰
-                 # 此处直接调用 run，假设它能正确处理
+                 # 简洁方案在 runner 内部判断是否为回测模式?不,入口处判断更清晰
+                 # 此处直接调用 run,假设它能正确处理
                  # !!! 注意WindTaskRunner 的 run 方法目前没有区分 forecast 和 backtrack !!!
                  # !!! 需要修改 WindTaskRunner.run 或在此处传入特殊参数 !!!
-                 # 临时解决方案修改传递给 runner 的配置副本，使其包含回测参数
+                 # 临时解决方案修改传递给 runner 的配置副本,使其包含回测参数
                  # runner_config_override = runner.effective_config.copy() # 获取 runner 当前配置
                  # runner_config_override['RuntimeInfo'] = {'is_backtracking': True, 'backtrack_config': backtrack_task_config}
                  # runner.config = runner_config_override # 临时修改配置? 不安全
@@ -172,7 +172,7 @@ def main():
                  # WindTaskRunner 需要根据 simulated_time 来计算回测窗口
                  # 并根据 task_config 中的 is_backtrack=True 来保存结果
                  # 因此 WindTaskRunner.__init__ 需要接收 task_config
-                 # (之前初始化已传入 full_config，WindTaskRunner 可自行查找)
+                 # (之前初始化已传入 full_config,WindTaskRunner 可自行查找)
                  runner.run(current_time_override=simulated_time)
                  successful_runs += 1
              except KeyboardInterrupt:

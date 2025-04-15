@@ -61,7 +61,7 @@ tasks:
         TimeBudget: 1800 # 更长的时间预算
 
   # --- 其他预测任务 (2天 到 11天) ---
-  # 结构类似 Forecast1Day，调整 task_id, description, forecast_horizon, triggers, offsets, SaveModelPath
+  # 结构类似 Forecast1Day,调整 task_id, description, forecast_horizon, triggers, offsets, SaveModelPath
   - task_id: Forecast2Day
     description: "未来 2 天功率预测任务"
     enabled: true # 根据实际需要启用
@@ -244,7 +244,7 @@ tasks:
         SaveModelPath: data/model/Forecast11Day
       AutoML:
         TimeBudget: 1800
-  # 需要为每个 horizon (3D, 4D, ..., 11D) 添加类似的条目，修改 task_id, description, forecast_horizon, SaveModelPath
+  # 需要为每个 horizon (3D, 4D, ..., 11D) 添加类似的条目,修改 task_id, description, forecast_horizon, SaveModelPath
   # 触发时间、数据窗口、AutoML预算等可根据实际需求调整或保持一致
 
   # --- 回测任务示例 (1天预测的回测) ---
@@ -256,7 +256,7 @@ tasks:
     forecast_horizon: 1D   # 回测对应的预测时长
     output_freq: "15min" # 回测结果的时间频率
 
-    # 回测执行触发器 (例如，每天早上跑一次昨天的回测)
+    # 回测执行触发器 (例如,每天早上跑一次昨天的回测)
     backtrack_trigger_cron: "30 8 * * *" # 每天 08:30 触发回测任务
 
     # 回测时间范围配置
@@ -284,7 +284,7 @@ tasks:
         TimeBudget: 600 # 回测时可以减少 AutoML 预算以加快速度
 
   # --- 其他回测任务 (4小时, 2天 到 11天) ---
-  # 结构类似 Backtrack1Day，调整 task_id, description, forecast_horizon,
+  # 结构类似 Backtrack1Day,调整 task_id, description, forecast_horizon,
   # backtrack_time_of_day (可能不同), backtrack_model_path_pattern, offsets (如果不同)
   # ... (省略 Backtrack4Hour, Backtrack2Day 到 Backtrack11Day 的重复结构) ...
 

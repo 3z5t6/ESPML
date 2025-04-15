@@ -26,7 +26,7 @@ try:
     ML_MODULE_LOADED = True
 except ImportError as e:
     ML_MODULE_LOADED = False
-    pytest.skip(f"跳过 ml 测试，因为无法导入 espml 模块: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 ml 测试,因为无法导入 espml 模块: {e}", allow_module_level=True)
 
 pytestmark = pytest.mark.skipif(not ML_MODULE_LOADED, reason="espml.ml 或其依赖项无法导入")
 
@@ -41,7 +41,7 @@ def sample_ml_config(tmp_path: Path) -> Dict[str, Any]:
         "Feature": {"TargetName": "target", "RandomSeed": 42, "TestSize": 0.25, "TimeFrequency": "1D", "CapacityKW": 100.0},
         "AutoFE": {"Running": True, "SaveFeatures": "OnlyGreater", "Method": "DFS"}, # 启用 AutoFE
         "AutoML": {"Running": True, "Method": "flaml", "TimeBudget": 10},
-        "IncrML": {"Enabled": False, "SaveModelPath": str(model_base_path)}, # IncrML 未启用，但提供路径
+        "IncrML": {"Enabled": False, "SaveModelPath": str(model_base_path)}, # IncrML 未启用,但提供路径
         "DataSource": {"dir": "dummy_data"}, # DP 需要
         "Cleaning": {}, # DP 需要
         "Resource": {},

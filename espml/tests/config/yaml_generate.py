@@ -1,6 +1,6 @@
 # espml/config/yaml_generate.py
 # -*- coding: utf-8 -*-
-# pylint: disable=all # 这是一个简单的工具脚本，禁用所有检查
+# pylint: disable=all # 这是一个简单的工具脚本,禁用所有检查
 """
 ESPML 默认 YAML 配置文件生成器
 用于生成 config.yaml 和 task_config.yaml 的模板文件
@@ -13,12 +13,12 @@ from pathlib import Path
 from typing import Dict, Any, List, Union
 import argparse
 
-# 添加项目根目录到路径，以便导入 const 和 utils
+# 添加项目根目录到路径,以便导入 const 和 utils
 script_dir = Path(__file__).parent.resolve()
 project_root = script_dir.parent # config 目录的上一级是项目根目录
 sys.path.insert(0, str(project_root))
 
-# 尝试导入模块，如果失败则定义后备
+# 尝试导入模块,如果失败则定义后备
 try:
     from espml.util import const
     from espml.util import utils as common_utils
@@ -54,7 +54,7 @@ DEFAULT_TASK_CONFIG: Dict[str, List[Dict[str, Any]]] = {
 def generate_default_config(output_dir: Union[str, Path], force_overwrite: bool = False) -> None:
     """生成默认的 config.yaml 和 task_config.yaml 文件"""
     if not YAML_DUMP_AVAILABLE:
-        print("错误PyYAML 库未安装，无法生成 YAML 文件", file=sys.stderr)
+        print("错误PyYAML 库未安装,无法生成 YAML 文件", file=sys.stderr)
         return
 
     output_path = Path(output_dir)
@@ -72,7 +72,7 @@ def generate_default_config(output_dir: Union[str, Path], force_overwrite: bool 
 
     for file_path, default_data in files_to_generate.items():
         if file_path.exists() and not force_overwrite:
-            print(f"文件已存在，跳过生成: {file_path}")
+            print(f"文件已存在,跳过生成: {file_path}")
             continue
         print(f"正在生成默认配置文件: {file_path}")
         try:
@@ -83,7 +83,7 @@ def generate_default_config(output_dir: Union[str, Path], force_overwrite: bool 
             print(f"错误生成文件 {file_path} 时失败: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
-    # 脚本入口，允许通过命令行指定输出目录和覆盖选项
+    # 脚本入口,允许通过命令行指定输出目录和覆盖选项
     default_output = const.PROJECT_CONFIG_DIR if const else Path('./default_config')
     parser_gen = argparse.ArgumentParser(description="生成 ESPML 默认配置文件")
     parser_gen.add_argument("--output_dir", type=str, default=str(default_output), help=f"配置文件输出目录 (默认: {default_output})")

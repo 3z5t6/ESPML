@@ -22,7 +22,7 @@ try:
     SAMPLING_MODULE_LOADED = True
 except ImportError as e:
     SAMPLING_MODULE_LOADED = False
-    pytest.skip(f"跳过 data_sampling 测试，因为导入失败: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 data_sampling 测试,因为导入失败: {e}", allow_module_level=True)
 
 # --- Fixtures ---
 @pytest.fixture

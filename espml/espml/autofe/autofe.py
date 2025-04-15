@@ -33,7 +33,7 @@ class AutoFE:
 
     属性:
         n (int): 特征工程的迭代轮数
-        method (Optional[str]): 特征工程方法（保留，未使用）
+        method (Optional[str]): 特征工程方法（保留,未使用）
         base_score (float): 用于比较的基线分数
         logger (logger): loguru logger 实例
         transformer (Transform): 特征转换器实例
@@ -53,7 +53,7 @@ class AutoFE:
         n: int = 2,
         method: Optional[str] = None,
         base_score: float = np.inf, # 初始化为最差分数 (假设越小越好)
-        logger_instance: Optional[LoguruLoggerType] = logger, # 接收 logger 实例，避免与 logger 变量冲突
+        logger_instance: Optional[LoguruLoggerType] = logger, # 接收 logger 实例,避免与 logger 变量冲突
         transformer: Optional[Transform] = None,
         **kwargs: Any # 接收完整的项目配置字典或 AutoFE 部分
     ):
@@ -66,11 +66,11 @@ class AutoFE:
             base_score (float): 基线分数 (应根据 metric 方向设置)
             logger_instance (Optional[logger]): loguru logger 实例
             transformer (Optional[Transform]): Transform 实例
-            **kwargs (Any): 附加参数字典，预期包含 'Feature', 'AutoFE', 'Resource' 等键
+            **kwargs (Any): 附加参数字典,预期包含 'Feature', 'AutoFE', 'Resource' 等键
         """
         # 使用传入或默认的 logger
         self.logger = logger_instance if logger_instance else logger.bind(name="AutoFE_default")
-        if not logger_instance: self.logger.warning("未提供 logger 实例，使用默认绑定")
+        if not logger_instance: self.logger.warning("未提供 logger 实例,使用默认绑定")
         # 绑定子 logger 名称
         self.logger = self.logger.bind(name="AutoFE")
 
@@ -89,8 +89,8 @@ class AutoFE:
         # 处理代码可能的拼写错误 'metirc' -> 'Metric'
         if self.metric is None and 'metirc' in FEATURE_CONFIG:
              self.metric = FEATURE_CONFIG.get('metirc')
-             self.logger.warning("配置键 'metirc' 被读取，建议更新为 'Metric'")
-        if not self.metric: # 如果仍然没有，设置默认或报错
+             self.logger.warning("配置键 'metirc' 被读取,建议更新为 'Metric'")
+        if not self.metric: # 如果仍然没有,设置默认或报错
              self.logger.error("初始化 AutoFE 失败缺少评估指标 'Metric' 配置")
              raise ValueError("缺少 Metric 配置")
 
@@ -107,14 +107,14 @@ class AutoFE:
         # 设置基线分数（根据指标方向）
         higher_is_better_metrics = {'roc_auc', 'f1', 'accuracy', 'auc_mu', 'r2', 'ap'} # 示例
         self.higher_is_better = self.metric in higher_is_better_metrics
-        # 如果传入的 base_score 是默认的 0.5，则根据 metric 调整
+        # 如果传入的 base_score 是默认的 0.5,则根据 metric 调整
         if base_score == 0.5: # 代码的默认值
              self.base_score = -np.inf if self.higher_is_better else np.inf
         else:
              self.base_score = float(base_score)
 
         # 提取并行计算配置
-        self.max_workers = RESOURCE_CONFIG.get('MaxWorkers', -1) # 默认使用所有核心？
+        self.max_workers = RESOURCE_CONFIG.get('MaxWorkers', -1) # 默认使用所有核心?
 
         # 初始化 Transformer
         if transformer is not None:
@@ -122,8 +122,8 @@ class AutoFE:
                   raise TypeError("'transformer' 参数必须是 Transform 类的实例")
              self.transformer = transformer
         else:
-             self.logger.debug("未提供 Transformer 实例，将创建一个新的实例...")
-             # 创建 Transform 实例，需要传递必要的配置给它
+             self.logger.debug("未提供 Transformer 实例,将创建一个新的实例...")
+             # 创建 Transform 实例,需要传递必要的配置给它
              transform_kwargs = {'Feature': FEATURE_CONFIG, 'logger': self.logger}
              try:
                   self.transformer = Transform(**transform_kwargs)
@@ -166,7 +166,7 @@ class AutoFE:
             raise ValueError("训练集或验证集的特征与标签索引不匹配")
         if not self.target_name: raise ValueError("目标变量名称 'target_name' 未设置")
         if self.target_name != y_train.name:
-             self.logger.warning(f"输入 y_train 名称 '{y_train.name}' 与配置 '{self.target_name}' 不符，将重命名")
+             self.logger.warning(f"输入 y_train 名称 '{y_train.name}' 与配置 '{self.target_name}' 不符,将重命名")
              y_train = y_train.rename(self.target_name)
              y_val = y_val.rename(self.target_name) # 同时重命名 y_val
 
@@ -176,7 +176,7 @@ class AutoFE:
         original_feature_cols = list(X_train.columns) # 初始特征列
 
         # --- 初始化状态 ---
-        # already_selected 存储所有已存在或已生成的特征名，防止重复生成
+        # already_selected 存储所有已存在或已生成的特征名,防止重复生成
         already_selected_features: Set[str] = set(original_feature_cols)
         if self.target_name: already_selected_features.add(self.target_name)
         if self.time_index: already_selected_features.add(self.time_index)
@@ -213,17 +213,17 @@ class AutoFE:
 
             if not candidate_feature_names:
                 if self.logger: self.logger.warning(f"迭代 {iteration_num}: 未生成新的候选特征名称结束 AutoFE 迭代")
-                break # 没有新候选，无法继续
+                break # 没有新候选,无法继续
 
             if self.logger: self.logger.info(f"迭代 {iteration_num}: 生成了 {len(candidate_feature_names)} 个候选特征名称")
 
             # 2. 快速特征筛选 (基于 Gini 的并行筛选)
             if self.logger: self.logger.debug("步骤 2: 使用多线程快速筛选候选特征 (Gini)...")
             selected_features_thread: List[str] = []
-            # 移除 new_df_thread，因为后续需要重新计算
+            # 移除 new_df_thread,因为后续需要重新计算
             features_scores: Dict[str, float] = {}
             try:
-                 # 严格传递参数，使用当前 df_train_iter
+                 # 严格传递参数,使用当前 df_train_iter
                  selected_features_thread, _, features_scores = threads_feature_select(
                      df=df_train_iter,
                      target_name=self.target_name,
@@ -241,7 +241,7 @@ class AutoFE:
 
             # 备选逻辑 
             if not selected_features_thread and iteration_num < self.n:
-                if self.logger: self.logger.warning(f"迭代 {iteration_num}: 线程筛选未选中特征，尝试备选策略...")
+                if self.logger: self.logger.warning(f"迭代 {iteration_num}: 线程筛选未选中特征,尝试备选策略...")
                 if features_scores:
                     sorted_scores = sorted(features_scores.items(), key=lambda item: item[1], reverse=True)
                     # 只从本轮生成的 candidate_feature_names 中选择
@@ -251,10 +251,10 @@ class AutoFE:
                          if self.logger: self.logger.info(f"迭代 {iteration_num}: 备选策略选中 {len(fallback_selected)} 个特征")
                          selected_features_thread = fallback_selected
                     # else: if self.logger: self.logger.warning(f"迭代 {iteration_num}: 备选策略也未选中任何特征")
-                # else: if self.logger: self.logger.warning(f"迭代 {iteration_num}: 无分数信息，无法执行备选策略")
+                # else: if self.logger: self.logger.warning(f"迭代 {iteration_num}: 无分数信息,无法执行备选策略")
 
             if not selected_features_thread:
-                 if self.logger: self.logger.warning(f"迭代 {iteration_num}: 没有特征通过快速筛选，跳过本轮模型选择")
+                 if self.logger: self.logger.warning(f"迭代 {iteration_num}: 没有特征通过快速筛选,跳过本轮模型选择")
                  continue # 进入下一轮迭代
 
             # 3. 计算选中的特征值 (在训练集和验证集上)
@@ -272,13 +272,13 @@ class AutoFE:
                  # 确保验证集的列与训练集匹配
                  missing_val_cols = set(df_train_iter.columns) - set(df_val_iter.columns)
                  if missing_val_cols:
-                      self.logger.warning(f"验证集缺少列: {missing_val_cols}，将用 NaN 填充")
+                      self.logger.warning(f"验证集缺少列: {missing_val_cols},将用 NaN 填充")
                       for col in missing_val_cols: df_val_iter[col] = np.nan
                  # 保留训练集的列顺序和存在性
                  df_val_iter = df_val_iter.reindex(columns=df_train_iter.columns)
             except Exception as e:
                  if self.logger: self.logger.exception(f"为模型选择计算特征时出错: {e}")
-                 continue # 计算失败，跳过本轮迭代
+                 continue # 计算失败,跳过本轮迭代
 
             # 4. 模型特征选择
             if self.logger: self.logger.debug("步骤 4: 执行模型特征选择...")
@@ -333,12 +333,12 @@ class AutoFE:
                 df_val_iter = df_val_iter[[col for col in cols_to_keep_next if col in df_val_iter.columns] + [self.target_name]]
                 # 再次确保验证集与训练集列一致
                 df_val_iter = df_val_iter.reindex(columns=df_train_iter.columns)
-                if self.logger: self.logger.debug(f"迭代 {iteration_num}: 为下轮迭代准备数据，保留 {len(df_train_iter.columns)-1} 个特征")
+                if self.logger: self.logger.debug(f"迭代 {iteration_num}: 为下轮迭代准备数据,保留 {len(df_train_iter.columns)-1} 个特征")
 
             except Exception as e:
                  if self.logger: self.logger.exception(f"模型特征选择过程中出错: {e}")
-                 logger.error("模型选择失败，将使用上一轮的特征集进行下一轮迭代（如果未完成）")
-                 # 保持 df_train_iter, df_val_iter 不变，进入下一轮或结束
+                 logger.error("模型选择失败,将使用上一轮的特征集进行下一轮迭代（如果未完成）")
+                 # 保持 df_train_iter, df_val_iter 不变,进入下一轮或结束
 
         # --- 迭代结束后处理 ---
         if self.logger:
@@ -361,7 +361,7 @@ class AutoFE:
                  df_val_final = df_val_final.reindex(columns=df_train_final.columns) # 保证列一致
             except Exception as e:
                  if self.logger: self.logger.exception(f"为最终选择生成 adv_features 时出错: {e}")
-                 logger.warning("无法生成 adv_features，将回退到 pick_features")
+                 logger.warning("无法生成 adv_features,将回退到 pick_features")
                  final_selected_features = pick_features
                  adv_features = set() # 标记为无法使用
 
@@ -420,10 +420,10 @@ class AutoFE:
                  final_X_train = X_train.copy()
                  final_X_val = X_val.copy()
                  final_selected_features = []
-                 logger.error("无法为最终输出生成高级特征，将返回特征")
+                 logger.error("无法为最终输出生成高级特征,将返回特征")
 
         # 打印最终日志（模拟 ml.py 中的日志）
-        # 这个日志应该由调用 AutoFE 的地方打印，但为了完整性在此处模拟
+        # 这个日志应该由调用 AutoFE 的地方打印,但为了完整性在此处模拟
         if self.logger:
             self.logger.info(f"autofe finished, search {len(final_selected_features)} features")
 

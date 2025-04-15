@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 AutoML 模块封装 (espml)
-主要负责与 AutoML 库 (FLAML) 进行交互，执行模型训练和预测
+主要负责与 AutoML 库 (FLAML) 进行交互,执行模型训练和预测
 """
 
 import time
@@ -14,7 +14,7 @@ import numpy as np
 from loguru import logger
 import joblib # 使用 joblib 进行序列化
 try:
-    from flaml import AutoML as FlamlAutoMLClass  # 导入并重命名 AutoML 类，用于运行时
+    from flaml import AutoML as FlamlAutoMLClass  # 导入并重命名 AutoML 类,用于运行时
     FLAML_INSTALLED = True
 except ImportError:
     logger.error("FLAML 库未安装AutoML 功能将不可用请运行 'pip install flaml'")
@@ -27,7 +27,7 @@ from espml.util import utils as common_utils
 try:
     from espml.autofe.model import _calculate_metric # 使用之前定义的内部函数
 except ImportError:
-    logger.error("无法从 espml.autofe.model 导入 _calculate_metric，评估功能受限")
+    logger.error("无法从 espml.autofe.model 导入 _calculate_metric,评估功能受限")
     # 定义一个占位函数以防止导入失败
     def _calculate_metric(*args, **kwargs): return np.nan
 
@@ -47,7 +47,7 @@ class FlamlAutomlWrapper:
 
         Args:
             config (Dict[str, Any]): AutoML 部分的配置 (project_config['AutoML'])
-            global_config (Optional[Dict[str, Any]]): 完整的项目配置，用于获取关联设置
+            global_config (Optional[Dict[str, Any]]): 完整的项目配置,用于获取关联设置
 
         Raises:
             ImportError: 如果 FLAML 未安装
@@ -55,7 +55,7 @@ class FlamlAutomlWrapper:
             KeyError: 如果缺少必要配置
         """
         if not FLAML_INSTALLED:
-             raise ImportError("FLAML 库未安装，无法初始化 FlamlAutomlWrapper")
+             raise ImportError("FLAML 库未安装,无法初始化 FlamlAutomlWrapper")
 
         self.logger = logger.bind(name="FlamlAutomlWrapper")
         if not isinstance(config, dict): raise ValueError("AutoML 配置必须是字典")
@@ -66,7 +66,7 @@ class FlamlAutomlWrapper:
         # --- 解析配置  ---
         self.method = self.config.get('Method', 'flaml')
         if self.method.lower() != 'flaml':
-             raise ValueError(f"此 Wrapper 只支持 'flaml' 方法，但配置为 '{self.method}'")
+             raise ValueError(f"此 Wrapper 只支持 'flaml' 方法,但配置为 '{self.method}'")
 
         self.time_budget = self.config.get('TimeBudget', 300)
         user_flaml_settings = self.config.get('flaml_settings', {}) # 用户指定的 FLAML 设置
@@ -77,14 +77,14 @@ class FlamlAutomlWrapper:
         self.random_seed = common_utils.safe_dict_get(self.global_config, 'Feature.RandomSeed')
 
         # --- 准备 FLAML 参数 ---
-        # 基础参数，会被 user_flaml_settings 覆盖
+        # 基础参数,会被 user_flaml_settings 覆盖
         self.flaml_settings: Dict[str, Any] = {
             'task': self.task_type,
             'metric': self.metric, # flaml 会自动映射或需要指定兼容指标
             'time_budget': self.time_budget,
             'seed': self.random_seed,
             'n_jobs': -1,
-            'log_file_name': 'flaml.log', # 默认名称，会在 fit 时覆盖
+            'log_file_name': 'flaml.log', # 默认名称,会在 fit 时覆盖
             'verbose': 3, # 假设代码设置了详细程度
             # 'estimator_list': 'auto', # 默认自动选择
             # 'eval_method': 'auto',
@@ -125,7 +125,7 @@ class FlamlAutomlWrapper:
             y_val: 验证目标 (可选)
             cat_features: 分类特征列表 (可选)
             log_dir: FLAML 日志目录 (可选)
-            experiment_name: 实验名称，用于日志文件名
+            experiment_name: 实验名称,用于日志文件名
 
         Raises:
             RuntimeError: 如果 FLAML 训练失败
@@ -153,7 +153,7 @@ class FlamlAutomlWrapper:
         else:
              default_log_file = f"{experiment_name}_flaml.log"
              fit_kwargs['log_file_name'] = default_log_file
-             self.logger.warning(f"未指定 FLAML 日志目录，将写入到当前目录: {default_log_file}")
+             self.logger.warning(f"未指定 FLAML 日志目录,将写入到当前目录: {default_log_file}")
 
         # 准备验证集 (如果提供)
         if X_val is not None and y_val is not None:
@@ -163,26 +163,26 @@ class FlamlAutomlWrapper:
              elif isinstance(y_val, np.ndarray) and y_val.ndim > 1: y_val = y_val.flatten()
              fit_kwargs['X_val'] = X_val
              fit_kwargs['y_val'] = y_val
-             # 代码可能强制 'holdout'，或者依赖 FLAML 自动判断
+             # 代码可能强制 'holdout',或者依赖 FLAML 自动判断
              # fit_kwargs['eval_method'] = 'holdout'
-        # else: self.logger.info("未提供验证集，FLAML 将使用内部方法评估")
+        # else: self.logger.info("未提供验证集,FLAML 将使用内部方法评估")
 
         # 处理分类特征
         if cat_features:
              valid_cats = [c for c in cat_features if c in X_train.columns]
              if len(valid_cats) != len(cat_features):
-                  logger.warning(f"提供的分类特征列表包含 X_train 中不存在的列，只传递存在的: {valid_cats}")
-             # FLAML v1+ 推荐在 DataFrame 中设置类型，而不是传列表
-             # 代码可能传递列表，
+                  logger.warning(f"提供的分类特征列表包含 X_train 中不存在的列,只传递存在的: {valid_cats}")
+             # FLAML v1+ 推荐在 DataFrame 中设置类型,而不是传列表
+             # 代码可能传递列表,
              fit_kwargs['categorical_feature'] = valid_cats
              logger.debug(f"传递 categorical_feature: {valid_cats}")
-             # 如果使用 DataFrame 类型，则需要在此转换 X_train/X_val 类型
+             # 如果使用 DataFrame 类型,则需要在此转换 X_train/X_val 类型
              # for col in valid_cats:
              #     X_train[col] = X_train[col].astype('category')
              #     if X_val is not None: X_val[col] = X_val[col].astype('category')
 
         # --- 执行训练 ---
-        self.automl_instance = FlamlAutoMLClass() # 创建新实例，使用重命名的类
+        self.automl_instance = FlamlAutoMLClass() # 创建新实例,使用重命名的类
         try:
              self.logger.info("调用 flaml.AutoML().fit()...")
              # logger.debug(f"FLAML fit kwargs: {fit_kwargs}") # 可能过长
@@ -216,7 +216,7 @@ class FlamlAutomlWrapper:
                        elif predict_proba_needed and not predict_proba_available:
                             logger.error(f"需要概率预测但最佳模型 {type(self.best_estimator)} 不支持 predict_proba无法计算 {self.metric}")
                             self.final_val_score = np.nan
-                       else: # 不需要预测（例如，如果 metric 已经被 flaml 计算并返回）
+                       else: # 不需要预测（例如,如果 metric 已经被 flaml 计算并返回）
                             self.final_val_score = self.best_loss # 假设 best_loss 就是最终分数 (不推荐)
 
 
@@ -228,14 +228,14 @@ class FlamlAutomlWrapper:
                             pass # final_val_score 已被设置
                        else: # 无法计算分数
                            self.final_val_score = self.best_loss # 回退到 best_loss
-                           self.logger.warning(f"无法在验证集上计算最终指标 {self.metric}，使用 FLAML 内部最佳损失 {self.best_loss:.6f} 代替")
+                           self.logger.warning(f"无法在验证集上计算最终指标 {self.metric},使用 FLAML 内部最佳损失 {self.best_loss:.6f} 代替")
 
                   except Exception as eval_e:
                        self.logger.error(f"使用最佳模型在验证集上评估失败: {eval_e}", exc_info=True)
                        self.final_val_score = self.best_loss # 评估失败则使用 best_loss
-                       self.logger.warning(f"评估失败，使用 FLAML 内部最佳损失 {self.best_loss:.6f}")
+                       self.logger.warning(f"评估失败,使用 FLAML 内部最佳损失 {self.best_loss:.6f}")
              else:
-                  # 没有提供验证集，直接使用 best_loss
+                  # 没有提供验证集,直接使用 best_loss
                   self.final_val_score = self.best_loss
                   self.logger.info(f"automl finished, best loss recorded by FLAML: {self.best_loss:.6f} (metric used by FLAML: {self.automl_instance.metric})")
 
@@ -322,7 +322,7 @@ class FlamlAutomlWrapper:
     def load_model(cls,
                    file_path: str,
                    logger_instance: Optional[Union[logging.Logger, 'LoguruLogger']] = None,  # 使用引号引用LoguruLogger
-                   # 需要提供加载时的配置，因为无法完全从模型恢复
+                   # 需要提供加载时的配置,因为无法完全从模型恢复
                    config: Optional[Dict[str, Any]] = None,
                    global_config: Optional[Dict[str, Any]] = None
                    ) -> Optional['FlamlAutomlWrapper']:
@@ -337,10 +337,10 @@ class FlamlAutomlWrapper:
             global_config (Optional[Dict[str, Any]]): 加载时使用的全局配置
 
         Returns:
-            Optional[FlamlAutomlWrapper]: 加载并初始化的 Wrapper 实例，如果失败则返回 None
+            Optional[FlamlAutomlWrapper]: 加载并初始化的 Wrapper 实例,如果失败则返回 None
         """
         lg = logger_instance if logger_instance else logger
-        # 绑定 logger 名称，如果 logger_instance 是 loguru logger
+        # 绑定 logger 名称,如果 logger_instance 是 loguru logger
         if hasattr(lg, 'bind'): lg = lg.bind(name="FlamlAutomlWrapper")
         lg.info(f"开始从文件加载 AutoML 模型: {file_path}")
 
@@ -363,7 +363,7 @@ class FlamlAutomlWrapper:
              elif hasattr(loaded_obj, 'predict'): # 假设加载的是估计器
                  loaded_automl_instance = None # 没有完整的 AutoML 实例
                  loaded_best_estimator = loaded_obj
-                 lg.warning("加载的是最佳估计器而非完整 AutoML 实例，部分信息（如 best_config, best_loss）可能丢失")
+                 lg.warning("加载的是最佳估计器而非完整 AutoML 实例,部分信息（如 best_config, best_loss）可能丢失")
              else:
                  lg.error(f"加载的文件 '{file_path}' 不是有效的 FLAML AutoML 实例或估计器 (类型: {type(loaded_obj)})")
                  return None

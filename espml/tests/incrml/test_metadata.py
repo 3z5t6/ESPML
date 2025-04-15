@@ -23,7 +23,7 @@ try:
     METADATA_MODULE_LOADED = True
 except ImportError as e:
     METADATA_MODULE_LOADED = False
-    pytest.skip(f"跳过 metadata 测试，因为导入失败: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 metadata 测试,因为导入失败: {e}", allow_module_level=True)
 
 # --- Fixtures ---
 @pytest.fixture
@@ -36,7 +36,7 @@ def sample_metadata_dir(tmp_path: Path) -> Path:
 @pytest.fixture
 def sample_version_info_data() -> Dict[str, Any]:
     """提供一个用于创建 ModelVersionInfo 的示例字典"""
-    # 使用相对路径或占位符，因为绝对路径依赖环境
+    # 使用相对路径或占位符,因为绝对路径依赖环境
     base_path = "model_output/run_20240101T100000Z"
     return {
         "version_id": "20240101T100000Z",
@@ -59,7 +59,7 @@ def sample_version_info(sample_version_info_data: Dict[str, Any]) -> ModelVersio
     return ModelVersionInfo.from_dict(sample_version_info_data)
 
 # --- 测试 ModelVersionInfo ---
-# (保持不变，已在先前步骤确认)
+# (保持不变,已在先前步骤确认)
 
 # --- 测试 IncrmlMetadata ---
 def test_incrml_metadata_init_new(sample_metadata_dir: Path):

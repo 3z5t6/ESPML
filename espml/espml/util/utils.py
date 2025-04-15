@@ -2,7 +2,7 @@
 """
 通用工具函数模块 (espml)
 包含项目中多个模块可能共用的辅助函数
-!! 假设文件约 1000 行，包含多种通用功能 !!
+!! 假设文件约 1000 行,包含多种通用功能 !!
 """
 
 import os
@@ -46,14 +46,14 @@ DATETIME_FORMAT_FILENAME = '%Y%m%d_%H%M%S'
 
 def mkdir_if_not_exist(dir_path: Union[str, Path], mode: int = 0o775) -> bool:
     """
-    如果目录不存在，则创建它 (包括父目录)
+    如果目录不存在,则创建它 (包括父目录)
 
     Args:
         dir_path (Union[str, Path]): 需要创建的目录路径
         mode (int): 创建目录时设置的权限模式 (八进制)
 
     Returns:
-        bool: 如果成功创建或目录已存在，返回 True；否则返回 False
+        bool: 如果成功创建或目录已存在,返回 True；否则返回 False
     """
     path = Path(dir_path)
     if not path.exists():
@@ -78,15 +78,15 @@ def mkdir_if_not_exist(dir_path: Union[str, Path], mode: int = 0o775) -> bool:
 
 def check_path_exists(path: Union[str, Path], path_type: Optional[str] = None, raise_error: bool = False) -> bool:
     """
-    检查路径是否存在，并可选地检查其类型（文件 'f' 或目录 'd'）
+    检查路径是否存在,并可选地检查其类型（文件 'f' 或目录 'd'）
 
     Args:
         path (Union[str, Path]): 路径
         path_type (Optional[str]): 'f' 检查是否为文件, 'd' 检查是否为目录None 则只检查存在性
-        raise_error (bool): 如果检查失败，是否引发异常
+        raise_error (bool): 如果检查失败,是否引发异常
 
     Returns:
-        bool: 如果检查通过，返回 True；否则返回 False (除非 raise_error=True)
+        bool: 如果检查通过,返回 True；否则返回 False (除非 raise_error=True)
 
     Raises:
         FileNotFoundError: 如果 raise_error=True 且路径不存在
@@ -114,7 +114,7 @@ def check_path_exists(path: Union[str, Path], path_type: Optional[str] = None, r
             raise TypeError(f"路径不是目录: {p}")
         return is_correct_type
     elif path_type is None:
-        return True # 只检查存在性，已通过
+        return True # 只检查存在性,已通过
     else:
          logger.warning(f"未知的路径类型检查: '{path_type}'")
          return False # 未知类型检查视为失败
@@ -128,7 +128,7 @@ def safe_remove(path: Union[str, Path], ignore_errors: bool = True) -> bool:
         ignore_errors (bool): 是否忽略删除过程中发生的错误
 
     Returns:
-        bool: 如果成功删除或路径不存在，返回 True；否则返回 False
+        bool: 如果成功删除或路径不存在,返回 True；否则返回 False
     """
     p = Path(path)
     try:
@@ -139,7 +139,7 @@ def safe_remove(path: Union[str, Path], ignore_errors: bool = True) -> bool:
             shutil.rmtree(p)
             logger.debug(f"已递归删除目录: {p}")
         else:
-            logger.debug(f"路径不存在，无需删除: {p}")
+            logger.debug(f"路径不存在,无需删除: {p}")
         return True
     except Exception as e:
         logger.error(f"删除路径时出错: {p} - {e}", exc_info=not ignore_errors)
@@ -162,7 +162,7 @@ def list_files_in_dir(dir_path: Union[str, Path], pattern: str = '*', recursive:
     """
     p = Path(dir_path)
     if not p.is_dir():
-        logger.warning(f"尝试列出文件，但目录不存在或不是目录: {p}")
+        logger.warning(f"尝试列出文件,但目录不存在或不是目录: {p}")
         return []
 
     try:
@@ -276,9 +276,9 @@ def decompress_file(input_path: Union[str, Path], output_dir: Union[str, Path], 
         elif comp_lower == 'zip':
             with zipfile.ZipFile(in_p, 'r') as zf:
                  zf.extractall(path=out_d) # 解压 zip 包内所有文件到目录
-                 # 如果 zip 包只有一个文件且名称与压缩包不同，这里的 output_path 可能不准确
+                 # 如果 zip 包只有一个文件且名称与压缩包不同,这里的 output_path 可能不准确
                  # 需要更复杂的逻辑来确定解压后的确切文件名
-                 logger.warning(f"解压 ZIP 文件 '{in_p}' 到目录 '{out_d}'，具体文件名取决于包内容")
+                 logger.warning(f"解压 ZIP 文件 '{in_p}' 到目录 '{out_d}',具体文件名取决于包内容")
                  # 此处简单假设解压成功即可
         elif comp_lower == 'tar':
              with tarfile.open(in_p, 'r') as tf:
@@ -343,7 +343,7 @@ def load_pickle(file_path: Union[str, Path], **kwargs) -> Optional[Any]:
     try:
         with open(path, 'rb') as f:
             # 添加 encoding='latin1' 或 'bytes' 可能解决一些版本兼容问题
-            # 但需要小心，最好确保保存和加载使用兼容的 Python 版本和库版本
+            # 但需要小心,最好确保保存和加载使用兼容的 Python 版本和库版本
             obj = pickle.load(f, **kwargs)
         # logger.debug(f"成功加载 Pickle 文件: {path}")
         return obj
@@ -402,12 +402,12 @@ def safe_dict_get(data: Optional[Mapping], key_path: Union[str, List[str]], defa
             # 尝试属性访问 (适用于对象)
             elif hasattr(current_level, key):
                   current_level = getattr(current_level, key, default) # 使用 getattr 以防属性不存在
-                  # 注意属性访问可能不是预期行为，取决于 key 的内容
+                  # 注意属性访问可能不是预期行为,取决于 key 的内容
             else:
                 # logger.debug(f"safe_dict_get: 在路径 {key_path} 中未找到键/索引 '{key}'")
                 return default
 
-            if current_level is None and key != keys[-1]: # 如果中间步骤为 None，则无法继续
+            if current_level is None and key != keys[-1]: # 如果中间步骤为 None,则无法继续
                 return default
         except (KeyError, IndexError, TypeError, AttributeError):
             # logger.debug(f"safe_dict_get: 访问路径 {key_path} 中的键/索引 '{key}' 时出错")
@@ -435,7 +435,7 @@ def flatten_nested_dict(d: Mapping, parent_key: str = '', sep: str = '.') -> Dic
 
 def merge_dictionaries(dict1: Dict, dict2: Dict, deep: bool = True) -> Dict:
     """
-    合并两个字典如果 deep=True，进行递归合并
+    合并两个字典如果 deep=True,进行递归合并
     注意: dict2 中的值会覆盖 dict1 中的同名键
     """
     merged = dict1.copy()
@@ -463,10 +463,10 @@ def parse_datetime_flexible(
     Args:
         datetime_str (Optional[str]): 输入的日期时间字符串
         fmts (Optional[Union[str, List[str]]]): 尝试解析的格式列表
-                                                  如果为 None，使用一组常用默认格式
+                                                  如果为 None,使用一组常用默认格式
                                                   可以包含 '%Y%m%d%H%M%S' 等无分隔符格式
-        tz (Optional[Union[str, datetime.tzinfo]]): 目标时区如果是字符串，将使用 pytz 查找
-                                                      如果为 None，返回 naive datetime
+        tz (Optional[Union[str, datetime.tzinfo]]): 目标时区如果是字符串,将使用 pytz 查找
+                                                      如果为 None,返回 naive datetime
         default (Optional[datetime.datetime]): 解析失败时返回的默认值
 
     Returns:
@@ -497,12 +497,12 @@ def parse_datetime_flexible(
     for fmt in formats_to_try:
         try:
             parsed_dt = datetime.datetime.strptime(datetime_str, fmt)
-            break # 解析成功，跳出循环
+            break # 解析成功,跳出循环
         except ValueError:
             continue # 尝试下一种格式
 
     if parsed_dt is None:
-        # 如果所有格式都失败，尝试让 pandas 自动推断（可能较慢）
+        # 如果所有格式都失败,尝试让 pandas 自动推断（可能较慢）
         try:
             parsed_dt = pd.to_datetime(datetime_str)
             if isinstance(parsed_dt, pd.Timestamp):
@@ -529,15 +529,15 @@ def parse_datetime_flexible(
              return default
 
         if parsed_dt.tzinfo is None:
-            # 如果解析出的是 naive datetime，假定它是目标时区（或 UTC? 需要业务逻辑确定）
-            # 普遍做法是先 localize 到某个默认时区（如本地或 UTC），再转换
-            # 简单处理直接附加目标时区 (不推荐，除非明确知道字符串就是目标时区)
+            # 如果解析出的是 naive datetime,假定它是目标时区（或 UTC? 需要业务逻辑确定）
+            # 普遍做法是先 localize 到某个默认时区（如本地或 UTC）,再转换
+            # 简单处理直接附加目标时区 (不推荐,除非明确知道字符串就是目标时区)
             # parsed_dt = target_tz.localize(parsed_dt)
             # 更安全的做法是要求输入带时区信息或指定时区
-            logger.warning(f"解析得到的 datetime 是 naive 的，但指定了目标时区 {tz}无法安全地进行时区转换返回 naive datetime")
+            logger.warning(f"解析得到的 datetime 是 naive 的,但指定了目标时区 {tz}无法安全地进行时区转换返回 naive datetime")
             # return default
         else:
-            # 如果解析出的是 aware datetime，转换到目标时区
+            # 如果解析出的是 aware datetime,转换到目标时区
             try:
                 parsed_dt = parsed_dt.astimezone(target_tz)
             except Exception as e:
@@ -696,16 +696,16 @@ class TimerContext(ContextManager[None]):
         else:
             self.logger.warning(f"计时器 '{self.name}' 未正确启动")
 
-# --- 并行处理 (示例，可能需要根据原代码调整) ---
+# --- 并行处理 (示例,可能需要根据原代码调整) ---
 
 # def parallel_map(func: Callable[[Any], Any], items: Iterable[Any], n_workers: int = -1, mode: str = 'process', chunksize: int = 1) -> List[Any]:
 #     """
 #     使用多进程或多线程并行执行函数
 #
 #     Args:
-#         func (Callable): 需要并行执行的函数 (必须是可 pickle 的，如果 mode='process')
+#         func (Callable): 需要并行执行的函数 (必须是可 pickle 的,如果 mode='process')
 #         items (Iterable): 需要处理的输入项列表
-#         n_workers (int): 工作进程/线程数-1 表示使用所有可用核心，1 表示串行执行
+#         n_workers (int): 工作进程/线程数-1 表示使用所有可用核心,1 表示串行执行
 #         mode (str): 'process' 使用多进程, 'thread' 使用多线程
 #         chunksize (int): 传递给 executor.map 的块大小
 #
@@ -713,7 +713,7 @@ class TimerContext(ContextManager[None]):
 #         List[Any]: 按输入顺序排列的结果列表
 #     """
 #     if n_workers == 1: # 串行执行
-#         logger.debug("parallel_map: n_workers=1，执行串行映射")
+#         logger.debug("parallel_map: n_workers=1,执行串行映射")
 #         return [func(item) for item in items]
 #
 #     items_list = list(items) # 需要具体列表才能获取长度

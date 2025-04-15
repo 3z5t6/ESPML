@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 概念漂移检测模块 (espml)
-包含概念漂移检测算法的实现，例如 DDM
+包含概念漂移检测算法的实现,例如 DDM
 """
 
 import math
@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod # 导入 ABC 用于基类
 from loguru import logger
 
 # --- 漂移检测器基类 (如果代码有) ---
-# 如果代码没有基类，可以直接移除 BaseDriftDetector
+# 如果代码没有基类,可以直接移除 BaseDriftDetector
 class BaseDriftDetector(ABC):
     """漂移检测器抽象基类"""
     def __init__(self, config: Dict[str, Any]):
@@ -97,7 +97,7 @@ class DriftDetectorDDM(BaseDriftDetector):
     def _reset(self) -> None:
         """重置 DDM 状态变量"""
         super()._reset() # 调用父类重置 drift_state
-        self.n: int = 0       # 样本计数器 (严格按 DDM 论文，从 0 开始，在 add_element 中 +1)
+        self.n: int = 0       # 样本计数器 (严格按 DDM 论文,从 0 开始,在 add_element 中 +1)
         self.p: float = 1.0   # 当前错误率估计值
         self.s: float = 0.0   # 当前错误率标准差估计值
         self.p_min: float = 1.0 # 观测到的最低错误率
@@ -109,9 +109,9 @@ class DriftDetectorDDM(BaseDriftDetector):
         添加新的预测结果（True 正确, False 错误）并更新 DDM 状态
          DDM 算法流程
         """
-        # 如果已检测到漂移，不再更新状态，需要外部 reset
+        # 如果已检测到漂移,不再更新状态,需要外部 reset
         if self.drift_state == 'drift':
-             # self.logger.trace("DDM 已检测到漂移，跳过状态更新")
+             # self.logger.trace("DDM 已检测到漂移,跳过状态更新")
              return
 
         # 1. 更新样本计数
@@ -133,7 +133,7 @@ class DriftDetectorDDM(BaseDriftDetector):
         # 3. 检查是否更新 p_min 和 s_min
         # 仅在达到最小样本数后才开始更新和检测
         if self.n < self.min_instance_num:
-            # logger.trace(f"样本数 ({self.n}) 未达到阈值 ({self.min_instance_num})，不更新 min 或检测漂移")
+            # logger.trace(f"样本数 ({self.n}) 未达到阈值 ({self.min_instance_num}),不更新 min 或检测漂移")
             return # 不更新也不检测
 
         current_p_s = self.p + self.s
@@ -145,16 +145,16 @@ class DriftDetectorDDM(BaseDriftDetector):
             self.p_min = self.p
             self.s_min = self.s
             # logger.trace(f"更新 p_min={self.p_min:.6f}, s_min={self.s_min:.6f} (p+s={current_p_s:.6f} < min_p+s={min_p_s:.6f})")
-            # 当状态改善时，如果之前是警告状态，应重置
+            # 当状态改善时,如果之前是警告状态,应重置
             if self.drift_state == 'warning':
-                 self.logger.info("DDM 状态改善，离开警告区域")
+                 self.logger.info("DDM 状态改善,离开警告区域")
                  self.drift_state = None
         # else: logger.trace(f"未更新 p_min/s_min (p+s={current_p_s:.6f} >= min_p+s={min_p_s:.6f})")
 
         # 4. 检查漂移和警告阈值
         # 确保 s_min > 0 以进行有效比较
         if self.s_min <= 0:
-             # logger.trace("s_min 为 0 或负数，无法进行漂移检测")
+             # logger.trace("s_min 为 0 或负数,无法进行漂移检测")
              return
 
         drift_threshold = self.p_min + self.drift_level_factor * self.s_min
@@ -165,15 +165,15 @@ class DriftDetectorDDM(BaseDriftDetector):
         # 状态转换逻辑 
         if current_p_s >= drift_threshold:
             if self.drift_state != 'drift': # 仅在首次检测到时记录
-                 self.logger.warning(f"DDM 检测到概念漂移！(p+s={current_p_s:.6f} >= drift_threshold={drift_threshold:.6f}) at n={self.n}")
+                 self.logger.warning(f"DDM 检测到概念漂移!(p+s={current_p_s:.6f} >= drift_threshold={drift_threshold:.6f}) at n={self.n}")
             self.drift_state = 'drift'
-            # 注意检测到漂移后，DDM 通常需要重置才能检测下一次漂移
-            # 但这里只设置状态，重置由外部管理器决定
+            # 注意检测到漂移后,DDM 通常需要重置才能检测下一次漂移
+            # 但这里只设置状态,重置由外部管理器决定
         elif current_p_s >= warning_threshold:
              if self.drift_state is None: # 仅在从稳定状态进入时记录
-                  self.logger.warning(f"DDM 进入警告区域！(p+s={current_p_s:.6f} >= warning_threshold={warning_threshold:.6f}) at n={self.n}")
-             # 即使之前是漂移状态，现在也降级为警告 (如果 p+s 下降了)
-             # 或者如果之前是警告，则保持警告
+                  self.logger.warning(f"DDM 进入警告区域!(p+s={current_p_s:.6f} >= warning_threshold={warning_threshold:.6f}) at n={self.n}")
+             # 即使之前是漂移状态,现在也降级为警告 (如果 p+s 下降了)
+             # 或者如果之前是警告,则保持警告
              self.drift_state = 'warning'
         else: # 低于警告阈值
              if self.drift_state is not None: # 如果之前是警告或漂移

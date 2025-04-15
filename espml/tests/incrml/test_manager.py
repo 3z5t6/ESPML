@@ -28,7 +28,7 @@ try:
     MANAGER_MODULE_LOADED = True
 except ImportError as e:
     MANAGER_MODULE_LOADED = False
-    pytest.skip(f"跳过 manager 测试，因为导入失败: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 manager 测试,因为导入失败: {e}", allow_module_level=True)
 
 pytestmark = pytest.mark.skipif(not MANAGER_MODULE_LOADED, reason="espml.incrml.manager 或其依赖项无法导入")
 
@@ -130,11 +130,11 @@ def test_manager_check_trigger_data_increase(mock_metadata, full_config_for_mana
     # 无历史
     mock_metadata.get_current_version.return_value = None
     assert manager.check_trigger(latest_data_timestamp=pd.Timestamp.now(tz=DEFAULT_TIMEZONE)) is True
-    # 有历史，新数据更新
+    # 有历史,新数据更新
     prev_meta = MagicMock(spec=ModelVersionInfo, training_data_end="2024-01-10T12:00:00Z")
     mock_metadata.get_current_version.return_value = prev_meta
     assert manager.check_trigger(latest_data_timestamp=pd.Timestamp("2024-01-10T13:00:00Z")) is True
-    # 有历史，新数据未更新
+    # 有历史,新数据未更新
     assert manager.check_trigger(latest_data_timestamp=pd.Timestamp("2024-01-10T11:00:00Z")) is False
     # 未提供时间戳
     assert manager.check_trigger(latest_data_timestamp=None) is False
@@ -187,7 +187,7 @@ def test_manager_prepare_data(mock_metadata, mock_sampler, full_config_for_manag
 def test_manager_update_workflow_success(mock_metadata, mock_sampler, mock_drift_detector,
                                          mock_ml_pipeline, full_config_for_manager):
     """测试成功的增量更新流程"""
-    # 初始化 manager，确保它使用 mock 组件
+    # 初始化 manager,确保它使用 mock 组件
     with patch('espml.incrml.manager.IncrmlMetadata', return_value=mock_metadata), \
          patch('espml.incrml.manager.get_sampler', return_value=mock_sampler), \
          patch('espml.incrml.manager.get_drift_detector', return_value=mock_drift_detector):
@@ -202,7 +202,7 @@ def test_manager_update_workflow_success(mock_metadata, mock_sampler, mock_drift
     mock_ml_pipeline.train.return_value = True # 训练成功
     mock_ml_pipeline.last_run_performance = {'rmse': 0.09} # 训练后的性能
     mock_ml_pipeline.automl_wrapper = MagicMock(metric='rmse', final_val_score=0.09)
-    # 假设 train 方法会设置这些属性，或者通过 _get_run_specific_paths 获取
+    # 假设 train 方法会设置这些属性,或者通过 _get_run_specific_paths 获取
     run_id_generated = "20240110100000000000" # 假设生成的 ID
     mock_ml_pipeline.last_run_id = run_id_generated
     model_p, tf_p, feat_p, _ = manager.ml_pipeline._get_run_specific_paths(run_id_generated) # 使用 manager 的 pipeline 实例
@@ -277,7 +277,7 @@ def test_manager_update_train_fail(mock_metadata, mock_sampler, mock_drift_detec
     mock_sampler.update_state.assert_not_called() # 不应更新 sampler
     mock_metadata.add_version.assert_not_called() # 不应添加版本
     mock_metadata.save.assert_not_called() # 不应保存元数据
-    mock_drift_detector._reset.assert_not_called() # 训练失败，不应重置检测器
+    mock_drift_detector._reset.assert_not_called() # 训练失败,不应重置检测器
 
 
 # --- 结束 tests/incrml/test_manager.py --- 

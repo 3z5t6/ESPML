@@ -27,7 +27,7 @@ def transform_config() -> Dict[str, Any]:
             "TimeIndex": "time", "GroupIndex": "group", # 添加 group_index
             "CategoricalFeature": ["cat1", "cat2"], # 指定分类特征
         },
-        # IncrML 和其他部分也可能被内部使用，但对 Transform 测试非必需
+        # IncrML 和其他部分也可能被内部使用,但对 Transform 测试非必需
     }
 
 @pytest.fixture
@@ -113,7 +113,7 @@ def test_transform_calculate_simple(transformer: Transform, sample_df_for_transf
     assert isinstance(result, pd.Series)
     assert result.name == feature_name
     expected = (sample_df_for_transform['A'].astype(float) + sample_df_for_transform['B'].astype(float)).fillna(0)
-    # 注意 _calculate 内部有 reset_index(drop=True)，索引会丢失
+    # 注意 _calculate 内部有 reset_index(drop=True),索引会丢失
     # assert_series_equal(result, expected.rename(feature_name), check_index=False) # 不检查索引
     # 修正Transform 的 transform/fit_transform 会保证索引对齐
     assert_series_equal(result, expected.rename(feature_name))
@@ -153,7 +153,7 @@ def test_transform_calculate_nested(transformer: Transform, sample_df_for_transf
 
 def test_transform_transform_nested_fit(transformer: Transform, sample_df_for_transform):
     """测试拟合嵌套的 transform 特征"""
-    # aggstd###A|||combine###C|||D$$$$$$ -> 按 C&D 组合分组，计算 A 的 std
+    # aggstd###A|||combine###C|||D$$$$$$ -> 按 C&D 组合分组,计算 A 的 std
     feature_name = "aggstd###A|||combine###C|||D$$$$$$"
     # 调用 fit
     transformer.fit(sample_df_for_transform, [feature_name])

@@ -31,7 +31,7 @@ try:
     from espml.util import utils as common_utils # 可能需要
     from loguru import logger # 需要 logger 实例
 except ImportError as e:
-    pytest.skip(f"跳过 algorithm 测试，因为无法导入 espml 模块: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 algorithm 测试,因为无法导入 espml 模块: {e}", allow_module_level=True)
 
 # 尝试导入 lightgbm 用于 mock 类型提示
 try:
@@ -47,7 +47,7 @@ except ImportError:
 def mock_transformer(mocker) -> MagicMock:
     """创建一个模拟的 Transform 实例"""
     mock = MagicMock(spec=Transform)
-    # 模拟 transform 方法接收 df 和 feature_list，返回包含新列的 df
+    # 模拟 transform 方法接收 df 和 feature_list,返回包含新列的 df
     def mock_transform_logic(df: pd.DataFrame, feature_list: List[str]) -> pd.DataFrame:
         res_df = df.copy()
         for feature_name in feature_list:
@@ -85,7 +85,7 @@ def sample_dataframe_reg() -> pd.DataFrame:
     }, index=pd.date_range('2024-02-01', periods=40, freq='D', name="datetime"))
 
 # --- 测试 max_threads_name2feature ---
-# (之前的实现已包含基本测试，此处可补充)
+# (之前的实现已包含基本测试,此处可补充)
 def test_max_threads_name2feature_empty_list(sample_dataframe_clf: pd.DataFrame, mock_transformer: MagicMock):
     """测试传入空特征列表"""
     df_result = max_threads_name2feature(
@@ -97,7 +97,7 @@ def test_max_threads_name2feature_empty_list(sample_dataframe_clf: pd.DataFrame,
 
 @patch('espml.autofe.algorithm.ThreadPoolExecutor', MagicMock()) # 禁用实际并行以简化测试
 def test_max_threads_name2feature_mixed_results(sample_dataframe_clf: pd.DataFrame, mock_transformer: MagicMock):
-    """测试部分特征成功，部分失败"""
+    """测试部分特征成功,部分失败"""
     features_to_calc = ["log###A$$$", "error_feat", "add###A|||B$$$"]
     # 配置 mock transform 行为
     def transform_side_effect(df, f_list):
@@ -172,7 +172,7 @@ def test_threads_feature_select_no_numeric_candidates(mock_calc_ginis, mock_max_
     assert scores == {}
 
 # --- 测试 _calculate_metric ---
-# （已在 test_autofe_model.py 或上一步骤中充分测试，此处省略）
+# （已在 test_autofe_model.py 或上一步骤中充分测试,此处省略）
 
 # --- 测试 model_features_select ---
 # 需要 mock LightGBM

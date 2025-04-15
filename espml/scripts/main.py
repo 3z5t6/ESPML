@@ -2,7 +2,7 @@
 # pylint: disable=invalid-name
 """
 ESPML 项目主入口脚本
-负责解析命令行参数，加载配置，初始化日志，并根据任务配置驱动 WindTaskRunner 执行
+负责解析命令行参数,加载配置,初始化日志,并根据任务配置驱动 WindTaskRunner 执行
 """
 
 import argparse
@@ -50,7 +50,7 @@ def parse_arguments() -> argparse.Namespace:
         "--task_id",
         type=str,
         default="ALL",
-        help="要执行的特定任务 ID (来自任务配置文件)默认为 'ALL'，执行所有启用的任务"
+        help="要执行的特定任务 ID (来自任务配置文件)默认为 'ALL',执行所有启用的任务"
     )
     parser.add_argument(
         "--log_dir",
@@ -65,7 +65,7 @@ def parse_arguments() -> argparse.Namespace:
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="日志记录级别 (默认: INFO)"
     )
-    # 可以添加其他参数，例如 --run_mode (train/predict), --date (用于特定日期运行) 等
+    # 可以添加其他参数,例如 --run_mode (train/predict), --date (用于特定日期运行) 等
     # ...
 
     args = parser.parse_args()
@@ -82,13 +82,13 @@ def load_and_merge_configs(args: argparse.Namespace) -> Optional[Dict[str, Any]]
 
     logger.info(f"加载任务配置文件: {args.task_config}")
     try:
-        # 任务配置直接加载，不提取 section
+        # 任务配置直接加载,不提取 section
         # 假设 task_config.yaml 的顶层是一个包含 'tasks' 列表的字典
         task_config_content = load_yaml_config(args.task_config)
         if 'tasks' not in task_config_content or not isinstance(task_config_content['tasks'], list):
              raise ConfigError("任务配置文件必须包含一个名为 'tasks' 的列表")
         # 将 tasks 列表合并到主配置中
-        # 使用深合并，避免覆盖其他顶级键
+        # 使用深合并,避免覆盖其他顶级键
         # project_config = common_utils.merge_dictionaries(project_config, task_config_content, deep=True)
         # 或者简单地将 tasks 列表添加到主配置
         project_config['tasks'] = task_config_content['tasks']
@@ -118,24 +118,24 @@ def main():
         logger.info("日志系统初始化完成")
     except Exception as log_e:
         print(f"错误初始化日志系统失败: {log_e}", file=sys.stderr)
-        # 即使日志失败，也尝试继续，但可能没有文件日志
+        # 即使日志失败,也尝试继续,但可能没有文件日志
         logger.remove() # 移除可能存在的处理器
         logger.add(sys.stderr, level=args.log_level.upper()) # 保证控制台输出
-        logger.error("初始化文件日志失败，仅使用控制台输出")
+        logger.error("初始化文件日志失败,仅使用控制台输出")
 
 
     # 3. 加载配置
     logger.info("开始加载配置...")
     full_config = load_and_merge_configs(args)
     if full_config is None:
-        logger.critical("无法加载配置，程序终止")
+        logger.critical("无法加载配置,程序终止")
         sys.exit(1)
     logger.info("配置加载完成")
 
     # 4. 执行任务
     task_list: List[Dict[str, Any]] = full_config.get('tasks', [])
     if not task_list:
-         logger.warning("任务配置列表为空，无任务执行")
+         logger.warning("任务配置列表为空,无任务执行")
          return
 
     # 获取所有任务的 ID
@@ -161,11 +161,11 @@ def main():
         task_conf = next((t for t in task_list if t.get('task_id') == task_id_to_run), None)
         # 再次检查配置是否存在且启用
         if not task_conf:
-            logger.error(f"内部错误无法找到任务 '{task_id_to_run}' 的配置（已在列表但未找到？）")
+            logger.error(f"内部错误无法找到任务 '{task_id_to_run}' 的配置（已在列表但未找到?）")
             fail_count += 1
             continue
         if not task_conf.get('enabled', False):
-             logger.info(f"任务 '{task_id_to_run}' 已配置但未启用 (enabled=false)，跳过")
+             logger.info(f"任务 '{task_id_to_run}' 已配置但未启用 (enabled=false),跳过")
              skipped_count += 1
              continue
 
@@ -175,11 +175,11 @@ def main():
             # 实例化并运行任务驱动器
             runner = WindTaskRunner(task_id=task_id_to_run, config=full_config)
             runner.run() # WindTaskRunner 内部处理训练/预测逻辑和错误
-            # 假设 run() 内部处理了所有预期的异常，如果 run() 成功结束就算成功
+            # 假设 run() 内部处理了所有预期的异常,如果 run() 成功结束就算成功
             success_count += 1
         except (ValueError, RuntimeError, Exception) as task_e:
              # 捕获初始化或运行期间的严重错误
-             logger.error(f"执行任务 '{task_id_to_run}' 过程中发生严重错误！")
+             logger.error(f"执行任务 '{task_id_to_run}' 过程中发生严重错误!")
              logger.exception(task_e) # 记录完整堆栈
              fail_count += 1
         task_end_time = time.time()
@@ -198,6 +198,6 @@ def main():
         sys.exit(0)
 
 if __name__ == "__main__":
-    # 设置基本的日志记录器，以防 setup_logger 失败
+    # 设置基本的日志记录器,以防 setup_logger 失败
     logger.add(sys.stderr, level="INFO")
     main()

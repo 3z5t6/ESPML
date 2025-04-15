@@ -23,17 +23,17 @@ try:
 except ImportError:
     INTEGRATION_TEST_READY = False
 
-pytestmark = pytest.mark.skipif(not INTEGRATION_TEST_READY, reason="核心 ESPML 模块无法导入，跳过集成测试")
+pytestmark = pytest.mark.skipif(not INTEGRATION_TEST_READY, reason="核心 ESPML 模块无法导入,跳过集成测试")
 
 def test_full_training_run(espml_test_project: Path, caplog):
     """
     测试运行一次完整的训练流程（非增量）
     Args:
         espml_test_project (Path): 由 fixture 创建的临时项目目录
-        caplog: pytest 内建 fixture，捕获日志输出
+        caplog: pytest 内建 fixture,捕获日志输出
     """
     project_dir = espml_test_project
-    # 修改工作目录，以便配置文件中的相对路径能正确解析
+    # 修改工作目录,以便配置文件中的相对路径能正确解析
     original_cwd = Path.cwd()
     os.chdir(project_dir)
 
@@ -48,7 +48,7 @@ def test_full_training_run(espml_test_project: Path, caplog):
         task_config_content = load_yaml_config(task_config_file)
         full_config['tasks'] = task_config_content['tasks']
 
-        # 确保任务已启用，且 IncrML 禁用（用于测试完全训练）
+        # 确保任务已启用,且 IncrML 禁用（用于测试完全训练）
         task_found = False
         for task in full_config['tasks']:
              if task['task_id'] == task_id_to_run:
@@ -66,7 +66,7 @@ def test_full_training_run(espml_test_project: Path, caplog):
         # 注意需要确保测试数据的时间范围与 runner 内部计算的训练窗口有交集
         # 可以 mock pd.Timestamp.now() 或传入 current_time_override
         # 此处假设测试数据足够覆盖默认配置下的训练窗口（例如过去30天）
-        # 为了稳定，我们 mock 当前时间
+        # 为了稳定,我们 mock 当前时间
         mock_current_time = pd.Timestamp("2024-01-15 10:00:00", tz=runner.DEFAULT_TIMEZONE)
 
         # --- 执行 ---
@@ -118,7 +118,7 @@ def test_full_training_run(espml_test_project: Path, caplog):
         # 切换回工作目录
         os.chdir(original_cwd)
 
-# --- 可以添加更多集成测试，例如测试预测流程、增量流程、回测流程 ---
+# --- 可以添加更多集成测试,例如测试预测流程、增量流程、回测流程 ---
 # 例如
 def test_prediction_flow():
     """测试预测流程"""

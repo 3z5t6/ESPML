@@ -61,7 +61,7 @@ def df_ts_group(series_ts) -> pd.DataFrame:
     """带分组键的时间序列 DataFrame"""
     df = series_ts.to_frame()
     df['group'] = ['G1', 'G1', 'G2', 'G2', 'G1']
-    # 交换列顺序，group 在前
+    # 交换列顺序,group 在前
     return df[['group', 'TS']]
 
 
@@ -151,7 +151,7 @@ def test_crosscount(df_cd):
     assert isinstance(intermediate, pd.Series) # Groupby size is Series
 
 def test_nunique(df_cd):
-    # 按 D 分组，计算 C 的 nunique
+    # 按 D 分组,计算 C 的 nunique
     # Group P: X, Y -> 2
     # Group Q: X, Y -> 2
     # Group NaN: Z -> 1

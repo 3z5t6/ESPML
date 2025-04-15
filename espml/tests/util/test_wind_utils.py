@@ -70,14 +70,14 @@ def test_calculate_air_density_invalid_pressure():
     """测试压力为负数"""
     temp_c = pd.Series([15.0])
     pressure_pa = pd.Series([-1000.0])
-    # 内部 clip 会处理，但可能直接报错或返回 NaN
-    # 根据当前实现，负压会被 clip 为 NaN 或导致计算错误，结果可能受 clip 影响
+    # 内部 clip 会处理,但可能直接报错或返回 NaN
+    # 根据当前实现,负压会被 clip 为 NaN 或导致计算错误,结果可能受 clip 影响
     # result = wind_utils.calculate_air_density(temp_c, pressure_pa)
     # assert pd.isna(result.iloc[0]) # 预期 NaN 或被 clip
-    # 或者，如果希望它报错
+    # 或者,如果希望它报错
     # with pytest.raises(ValueError, match="压力数据包含负值"): # 需要修改函数以在 clip 前报错
     #     wind_utils.calculate_air_density(temp_c, pressure_pa)
-    # 当前实现是 clip，所以不报错
+    # 当前实现是 clip,所以不报错
     result = wind_utils.calculate_air_density(temp_c, pressure_pa)
     assert pd.notna(result.iloc[0]) # 因为 clip 和 fillna(0) 处理了
 
@@ -123,7 +123,7 @@ def test_pc_filter_above_cutout(self, pc_filter_data):
     """测试高于切出风速但功率异常"""
     power, wind_speed, capacity = pc_filter_data
     result = wind_utils.filter_by_power_curve(power, wind_speed, capacity, max_wind_speed=25.0, invalid_power_threshold_kw=15.0)
-    assert pd.isna(result.iloc[3]) # 1600kW @ 26m/s (功率也超了，但主要是风速)
+    assert pd.isna(result.iloc[3]) # 1600kW @ 26m/s (功率也超了,但主要是风速)
     assert pd.isna(result.iloc[5]) # 20kW @ 27m/s 应被过滤
 
 def test_pc_filter_power_out_of_range(self, pc_filter_data):

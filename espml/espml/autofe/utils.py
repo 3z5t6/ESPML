@@ -14,7 +14,7 @@ import pandas as pd
 
 # 导入日志记录器 (适配 espml 的日志系统)
 from loguru import logger
-# from module.util.log import get_logger # 导入，替换为 loguru
+# from module.util.log import get_logger # 导入,替换为 loguru
 # logger = get_logger(__name__) # 获取 logger 方式
 # 直接使用全局 logger 或创建子 logger
 logger = logger.bind(name="autofe.utils") # 创建一个子 logger (可选)
@@ -77,7 +77,7 @@ def split_num_cat_features(
     cat_columns: List[str] = []
     num_columns: List[str] = []
 
-    logger.debug(f"开始分割特征类型，忽略列: {ignore_set}")
+    logger.debug(f"开始分割特征类型,忽略列: {ignore_set}")
     for column in df.columns:
         if column in ignore_set:
             logger.trace(f"跳过忽略列: {column}")
@@ -104,7 +104,7 @@ def split_num_cat_features(
                      num_columns.append(column)
                      logger.trace(f"列 '{column}' (类型: {col_type_name}) 被识别为数值特征")
             else:
-                logger.warning(f"列 '{column}' 的数据类型 '{col_type_name}' 未知或无法处理，已跳过")
+                logger.warning(f"列 '{column}' 的数据类型 '{col_type_name}' 未知或无法处理,已跳过")
 
         except Exception as e:
             logger.exception(f"处理列 '{column}' 时发生错误: {e}") # 使用 exception 记录完整堆栈
@@ -122,11 +122,11 @@ def split_features(key: str) -> List[str]:
         key (str): 组合特征名称字符串
 
     Returns:
-        List[str]: 解析后的组件列表，第一个元素是操作符，后续是特征名或参数
-                   如果解析失败或格式不符，返回仅包含键的列表
+        List[str]: 解析后的组件列表,第一个元素是操作符,后续是特征名或参数
+                   如果解析失败或格式不符,返回仅包含键的列表
     """
-    # 代码的解析逻辑 (优先使用更健壮的正则方法，如果确认代码使用它)
-    # 此处使用之前确认的正则方法，因为它更可能健壮地处理各种情况
+    # 代码的解析逻辑 (优先使用更健壮的正则方法,如果确认代码使用它)
+    # 此处使用之前确认的正则方法,因为它更可能健壮地处理各种情况
     head_esc = re.escape(OPERATORCHAR.head_character)
     tail_esc = re.escape(OPERATORCHAR.tail_character)
     # sep_esc = re.escape(OPERATORCHAR.feature_separator) # 分隔符通常不需要转义
@@ -136,12 +136,12 @@ def split_features(key: str) -> List[str]:
         operator = match.group(1)
         content = match.group(2)
         components = content.split(OPERATORCHAR.feature_separator)
-        # 代码可能没有清理空字符串，
+        # 代码可能没有清理空字符串,
         # cleaned_components = [c for c in components if c] # 不清理
         # logger.trace(f"解析特征 '{key}' -> Op: '{operator}', Comp: {components}")
         return [operator] + components
     else:
-        # logger.trace(f"特征名称 '{key}' 不符合组合特征格式，返回原名称")
+        # logger.trace(f"特征名称 '{key}' 不符合组合特征格式,返回原名称")
         return [key]
 
 def is_combination_feature(feature_name: str) -> bool:
@@ -191,9 +191,9 @@ def feature_space(
     head_character = OPERATORCHAR.head_character
     tail_character = OPERATORCHAR.tail_character
 
-    logger.info(f"开始生成候选特征，最大限制: {max_candidate_features}")
+    logger.info(f"开始生成候选特征,最大限制: {max_candidate_features}")
 
-    # 内部函数用于添加候选，并检查限制和重复
+    # 内部函数用于添加候选,并检查限制和重复
     def add_candidate(name: str) -> bool:
         nonlocal candidate_feature, already_selected_set
         if len(candidate_feature) < max_candidate_features and name not in already_selected_set:
@@ -210,7 +210,7 @@ def feature_space(
         # ('c',)
         for op_name in OPERATORTYPES.get(('c',), []):
             name = f"{op_name}{head_character}{c_col1}{tail_character}"
-            if not add_candidate(name): break # 如果达到上限，停止为 c_col1 生成
+            if not add_candidate(name): break # 如果达到上限,停止为 c_col1 生成
         if len(candidate_feature) >= max_candidate_features: break
         # ('c', 'c')
         for j in range(i + 1, len(cat_columns)): # 避免重复对 (a,b) vs (b,a)
@@ -220,7 +220,7 @@ def feature_space(
              pair_str = feature_separator.join(sorted_pair)
              for op_name in OPERATORTYPES.get(('c', 'c'), []):
                  name = f"{op_name}{head_character}{pair_str}{tail_character}"
-                 if not add_candidate(name): break # 如果达到上限，停止为此对生成
+                 if not add_candidate(name): break # 如果达到上限,停止为此对生成
 
     # --- 数值与分类混合 ('n', 'c') ---
     if len(candidate_feature) < max_candidate_features:
@@ -254,7 +254,7 @@ def feature_space(
     # --- 时间序列特征 ('n', 't'), ('target', 't') ---
     if time_index is not None and len(candidate_feature) < max_candidate_features:
         effective_time_span = time_span if time_span is not None else TIME_SPAN
-        logger.debug(f"生成时间序列特征，时间跨度: {effective_time_span}")
+        logger.debug(f"生成时间序列特征,时间跨度: {effective_time_span}")
         # ('n', 't')
         for n_col in num_columns:
             if len(candidate_feature) >= max_candidate_features: break
@@ -266,11 +266,11 @@ def feature_space(
         # target delay ('target', 't')
         if target_name and target_name in df.columns and len(candidate_feature) < max_candidate_features:
             for d in effective_time_span:
-                # 使用 'delay' 操作符名称，参数是负的时间跨度 (与代码一致)
+                # 使用 'delay' 操作符名称,参数是负的时间跨度 (与代码一致)
                 name = f"delay{head_character}{target_name}{feature_separator}{-d}{tail_character}"
                 if not add_candidate(name): break
 
-    logger.info(f"候选特征生成完成，共生成 {len(candidate_feature)} 个特征 (已应用限制)")
+    logger.info(f"候选特征生成完成,共生成 {len(candidate_feature)} 个特征 (已应用限制)")
     return candidate_feature
 
 def feature2table(names: List[str]) -> pd.DataFrame:
@@ -303,7 +303,7 @@ def name2formula(input_str: str) -> str:
 
     parts = split_features(input_str)
     if not parts or len(parts) < 2:
-        logger.warning(f"解析特征名称 '{input_str}' 失败或组件不足，无法转换为公式")
+        logger.warning(f"解析特征名称 '{input_str}' 失败或组件不足,无法转换为公式")
         return input_str.replace('_', r'\_')
 
     op_name = parts[0]
@@ -354,9 +354,9 @@ def name2formula(input_str: str) -> str:
             if num_subs == expected_args:
                 formula = fmt_str.format(*sub_formulas) # 使用 * 解包
             else:
-                raise ValueError(f"操作符 '{op_name}' 需要 {expected_args} 个参数，但得到 {num_subs} 个")
+                raise ValueError(f"操作符 '{op_name}' 需要 {expected_args} 个参数,但得到 {num_subs} 个")
         else:
-            logger.warning(f"未知操作符 '{op_name}'，使用通用公式表示")
+            logger.warning(f"未知操作符 '{op_name}',使用通用公式表示")
             op_name_escaped = op_name.replace('_', r'\_')
             sub_formulas_str = ', '.join(sub_formulas)
             formula = fr"\text{{{op_name_escaped}}}({sub_formulas_str})"
@@ -369,7 +369,7 @@ def name2formula(input_str: str) -> str:
 
 # --- Gini 系数计算函数 ---
 def ginic(actual: np.ndarray, pred: np.ndarray) -> float:
-    """计算（非标准化的）Gini 系数，增强类型和数值检查"""
+    """计算（非标准化的）Gini 系数,增强类型和数值检查"""
     try:
         # 强制转换为 float64 numpy array
         actual_f = np.asarray(actual, dtype=np.float64)
@@ -380,7 +380,7 @@ def ginic(actual: np.ndarray, pred: np.ndarray) -> float:
              return 0.0
         # 检查 NaN 或 Inf
         if not np.all(np.isfinite(actual_f)) or not np.all(np.isfinite(pred_f)):
-             logger.warning("Gini 输入包含 NaN 或 Inf 值，将尝试移除")
+             logger.warning("Gini 输入包含 NaN 或 Inf 值,将尝试移除")
              valid_mask = np.isfinite(actual_f) & np.isfinite(pred_f)
              actual_f = actual_f[valid_mask]
              pred_f = pred_f[valid_mask]
@@ -456,7 +456,7 @@ def calc_ginis(data: Union[pd.DataFrame, np.ndarray], target: Union[pd.Series, n
         columns = numeric_cols.columns.tolist()
     elif isinstance(data, np.ndarray):
         if not pd.api.types.is_numeric_dtype(data.dtype):
-             logger.warning("输入 Numpy 数组不是数值类型，无法计算 Gini")
+             logger.warning("输入 Numpy 数组不是数值类型,无法计算 Gini")
              return np.array([], dtype=np.float32)
         data_np = data
         columns = [f"col_{i}" for i in range(data.shape[1])]
@@ -494,12 +494,12 @@ def normalize_gini_select(
     top_n: int = 20
 ) -> Tuple[List[str], Dict[str, float]]:
     """使用标准化的 Gini 指数进行特征筛选"""
-    logger.info(f"开始基于 Gini 的特征筛选，最多选择 {top_n} 个新特征...")
+    logger.info(f"开始基于 Gini 的特征筛选,最多选择 {top_n} 个新特征...")
     best_features: List[str] = []
     gini_scores_dict: Dict[str, float] = {}
 
     if df.empty:
-        logger.warning("输入的 DataFrame 为空，无法进行 Gini 筛选")
+        logger.warning("输入的 DataFrame 为空,无法进行 Gini 筛选")
         return best_features, gini_scores_dict
 
     df_numeric = df.select_dtypes(include=np.number)
@@ -532,12 +532,12 @@ def normalize_gini_select(
         logger.exception(f"执行 Gini 特征筛选时出错: {e}")
         return [], gini_scores_dict # 返回空列表
 
-    logger.info(f"基于 Gini 的特征筛选完成，选中 {len(best_features)} 个新特征")
+    logger.info(f"基于 Gini 的特征筛选完成,选中 {len(best_features)} 个新特征")
     return best_features, gini_scores_dict
 
 # --- 时间窗口配置解析 ---
 def update_time_span(config_value: Any) -> Optional[List[int]]:
-    """解析时间窗口配置值，将其转换为整数列表"""
+    """解析时间窗口配置值,将其转换为整数列表"""
     # logger.trace(f"解析时间窗口配置值: {config_value} (类型: {type(config_value)})")
     if config_value is None: return None
     elif isinstance(config_value, int): return [config_value]

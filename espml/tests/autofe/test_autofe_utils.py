@@ -21,7 +21,7 @@ def test_constants_definition():
     assert isinstance(OPERATORCHAR.head_character, str)
     assert isinstance(OPERATORCHAR.tail_character, str)
     assert isinstance(OPERATORTYPES, dict)
-    assert isinstance(autofe_utils.OPERTORS, set) # 注意代码变量名 OPEATORS，已在utils中修正
+    assert isinstance(autofe_utils.OPERTORS, set) # 注意代码变量名 OPEATORS,已在utils中修正
     assert len(autofe_utils.OPERTORS) > 0
     assert isinstance(TIME_SPAN, list)
 
@@ -91,15 +91,15 @@ def test_split_features(feature_name: str, expected_parts: List[str]):
     ("no_headcolA|||colB$$$", False),
     ("add###no_tail", False),
     ("incomplete#$$", False),
-    ("###$$$", True), # 极端情况，格式上是组合特征
+    ("###$$$", True), # 极端情况,格式上是组合特征
 ])
 def test_is_combination_feature(feature_name: str, expected_result: bool):
     """测试判断是否为组合特征的函数"""
     assert autofe_utils.is_combination_feature(feature_name) == expected_result
 
 # --- 测试 feature_space ---
-# 测试 feature_space 比较复杂，因为它依赖于大量的 OPERATORTYPES
-# 这里只做基本的功能性测试，不验证所有可能的组合输出
+# 测试 feature_space 比较复杂,因为它依赖于大量的 OPERATORTYPES
+# 这里只做基本的功能性测试,不验证所有可能的组合输出
 @pytest.fixture
 def df_for_feature_space() -> pd.DataFrame:
     """提供用于 feature_space 测试的 DataFrame"""
@@ -145,7 +145,7 @@ def test_feature_space_max_candidates(df_for_feature_space: pd.DataFrame):
     assert len(candidates) == max_num
 
 # --- 测试 name2formula 和 feature2table ---
-# name2formula 的测试比较繁琐，因为它依赖于 split_features 和递归
+# name2formula 的测试比较繁琐,因为它依赖于 split_features 和递归
 def test_name2formula_simple():
     """测试简单特征名的转换"""
     assert autofe_utils.name2formula("my_feature") == r"$my\_feature$"
@@ -200,7 +200,7 @@ def test_gini_normalized(gini_data):
     y_true, y_pred_perfect, y_pred_random, y_pred_inverted, y_pred_good = gini_data
     assert np.isclose(autofe_utils.gini_normalized(y_true, y_pred_perfect), 1.0)
     assert np.isclose(autofe_utils.gini_normalized(y_true, y_pred_random), 0.0)
-    assert np.isclose(autofe_utils.gini_normalized(y_true, y_pred_inverted), 1.0) # 取了绝对值，所以是 1.0
+    assert np.isclose(autofe_utils.gini_normalized(y_true, y_pred_inverted), 1.0) # 取了绝对值,所以是 1.0
     assert 0 < autofe_utils.gini_normalized(y_true, y_pred_good) < 1.0
 
 def test_calc_ginis(gini_data):

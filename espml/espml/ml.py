@@ -25,7 +25,7 @@ from espml.automl.automl import FlamlAutomlWrapper
 from espml.incrml.metadata import ModelVersionInfo # 需要创建元数据对象
 from espml.util import utils as common_utils
 from espml.util import const
-from espml.util import result_saver # 可能需要保存初始评估？
+from espml.util import result_saver # 可能需要保存初始评估,
 
 class MLPipeline:
     """
@@ -61,7 +61,7 @@ class MLPipeline:
         # 修正从 IncrML 配置获取模型保存基础路径
         self.base_model_save_path = self.incrml_config.get('SaveModelPath', f'data/model/{self.task_name}')
 
-        # 内部状态，存储上次运行的结果路径等
+        # 内部状态,存储上次运行的结果路径等
         self.last_run_id: Optional[str] = None
         self.last_run_model_path: Optional[str] = None
         self.last_run_transformer_path: Optional[str] = None
@@ -101,7 +101,7 @@ class MLPipeline:
 
         Args:
             df_train_full (pd.DataFrame): 包含特征和目标列的完整训练数据集
-            run_id (Optional[str]): 本次运行的 ID如果为 None，则自动生成
+            run_id (Optional[str]): 本次运行的 ID如果为 None,则自动生成
 
         Returns:
             bool: 训练是否成功完成
@@ -119,8 +119,8 @@ class MLPipeline:
         self.logger.info(f"模型及状态将保存到: {os.path.dirname(model_path)}")
 
         # --- 步骤 1: 数据处理 ---
-        # (MLPipeline 不直接调用 DP，而是接收已处理数据？)
-        # (与 wind_incrml 分析矛盾，此处假设 MLPipeline 负责调用 DP)
+        # (MLPipeline 不直接调用 DP,而是接收已处理数据?)
+        # (与 wind_incrml 分析矛盾,此处假设 MLPipeline 负责调用 DP)
         self.logger.info("步骤 1/5: 执行数据处理...")
         X_processed: Optional[pd.DataFrame] = None
         y_processed: Optional[pd.Series] = None
@@ -135,7 +135,7 @@ class MLPipeline:
             initial_features = list(X_processed.columns)
             self.logger.info(f"数据处理完成处理后特征数量: {len(initial_features)}")
         except Exception as e:
-            self.logger.exception("数据处理阶段失败！训练终止")
+            self.logger.exception("数据处理阶段失败!训练终止")
             return False
 
         # --- 步骤 2: 训练/验证集拆分 ---
@@ -151,14 +151,14 @@ class MLPipeline:
             )
             self.logger.info(f"拆分完成训练集大小: {X_train.shape}, 验证集大小: {X_val.shape}")
         except Exception as e:
-            self.logger.exception("拆分训练/验证集失败！训练终止")
+            self.logger.exception("拆分训练/验证集失败!训练终止")
             return False
 
         # --- 步骤 3: (可选) 初始评估 ---
         #  "origin data train val rmse"
         self.logger.info("步骤 3/5: 执行初始基线评估...")
         try:
-            # 使用简单快速的模型，例如 ExtraTreesRegressor
+            # 使用简单快速的模型,例如 ExtraTreesRegressor
             initial_model = ExtraTreesRegressor(n_estimators=20, n_jobs=-1, random_state=self.random_seed)
             initial_model.fit(X_train.fillna(0), y_train) # 简单填充NaN
             initial_preds = initial_model.predict(X_val.fillna(0))
@@ -174,13 +174,13 @@ class MLPipeline:
         self.logger.info("步骤 4/5: 执行自动特征工程 (AutoFE)...")
         final_selected_autofe_features: List[str] = []
         autofe_transformer_state: Optional[Dict] = None
-        X_train_final = X_train # 如果 AutoFE 失败或禁用，使用拆分数据
-        X_val_final = X_val     # 如果 AutoFE 失败或禁用，使用拆分数据
+        X_train_final = X_train # 如果 AutoFE 失败或禁用,使用拆分数据
+        X_val_final = X_val     # 如果 AutoFE 失败或禁用,使用拆分数据
         try:
-            # 实例化 AutoFE 引擎，传递完整配置
+            # 实例化 AutoFE 引擎,传递完整配置
             autofe_instance = AutoFE(logger_instance=self.logger, **self.effective_config)
             if autofe_instance.running:
-                 # 调用 fit，传入拆分后的数据
+                 # 调用 fit,传入拆分后的数据
                  # autofe.fit 内部会打印 "Autofe Trial finished..." 等日志
                  # 返回增强后的 X_train, X_val 和选中的 *新* 特征列表
                  X_train_final, X_val_final, _, _, final_selected_autofe_features = autofe_instance.fit(
@@ -193,25 +193,25 @@ class MLPipeline:
                  # 严格匹配日志
                  self.logger.info(f"autofe finished, search {len(final_selected_autofe_features)} features")
             else:
-                 self.logger.info("AutoFE 未启用，跳过此步骤")
+                 self.logger.info("AutoFE 未启用,跳过此步骤")
                  final_selected_autofe_features = []
                  autofe_transformer_state = {} # 保存空状态
 
             # 保存 AutoFE 结果 (状态和特征列表)
             #  Transformer 状态
             if not common_utils.dump_pickle(autofe_transformer_state, transformer_path):
-                 self.logger.error("保存 AutoFE Transformer 状态失败！后续预测可能出错")
-                 # 是否算作训练失败？，此处假设继续但记录错误
+                 self.logger.error("保存 AutoFE Transformer 状态失败!后续预测可能出错")
+                 # 是否算作训练失败?,此处假设继续但记录错误
             else:
                  self.logger.info(f"AutoFE Transformer 状态已保存到: {transformer_path}")
             # 保存选中的特征列表
             if not common_utils.write_json_file({"selected_features": final_selected_autofe_features}, features_path):
-                 self.logger.error("保存选中的 AutoFE 特征列表失败！后续预测可能出错")
+                 self.logger.error("保存选中的 AutoFE 特征列表失败!后续预测可能出错")
             else:
                  self.logger.info(f"选中的 AutoFE 特征列表已保存到: {features_path}")
 
         except Exception as e:
-            self.logger.exception("自动特征工程 (AutoFE) 阶段失败！训练终止")
+            self.logger.exception("自动特征工程 (AutoFE) 阶段失败!训练终止")
             return False
 
         # --- 步骤 5: 自动机器学习 (AutoML) ---
@@ -240,7 +240,7 @@ class MLPipeline:
 
             # 保存 AutoML 模型
             if not automl_wrapper.save_model(model_path):
-                 raise RuntimeError("保存 AutoML 模型失败！")
+                 raise RuntimeError("保存 AutoML 模型失败!")
 
             training_successful = True # 标记训练成功
             # 存储结果供外部获取（如果需要）
@@ -251,7 +251,7 @@ class MLPipeline:
             self.last_run_selected_autofe_features = final_selected_autofe_features
 
         except Exception as e:
-            self.logger.exception("自动机器学习 (AutoML) 阶段失败！")
+            self.logger.exception("自动机器学习 (AutoML) 阶段失败!")
             training_successful = False # 标记失败
 
         # --- 训练结束 ---
@@ -279,7 +279,7 @@ class MLPipeline:
             run_id (str): 要加载的模型/状态对应的运行 ID
 
         Returns:
-            Optional[np.ndarray]: 预测结果数组，如果失败则返回 None
+            Optional[np.ndarray]: 预测结果数组,如果失败则返回 None
         """
         self.logger.info(f"================ 开始预测 (使用 Run ID: {run_id}) ================")
         predict_start_time = time.time()
@@ -321,7 +321,7 @@ class MLPipeline:
         X_test_processed: Optional[pd.DataFrame] = None
         try:
             data_processor = DataProcessor(config=self.effective_config)
-            # 预测时不需要目标列，但 process 可能需要完整 DF 结构
+            # 预测时不需要目标列,但 process 可能需要完整 DF 结构
             # 假设 process 可以处理不含 target 的 DF
             if self.target_name in X_test.columns:
                  X_test_input = X_test.drop(columns=[self.target_name])
@@ -335,13 +335,13 @@ class MLPipeline:
                  initial_features_pred = [f for f in data_processor.output_feature_names if f != self.target_name]
             else: # 回退假设 X_test_processed 的列就是初始特征
                  initial_features_pred = list(X_test_processed.columns)
-                 logger.warning("无法从 DataProcessor 获取确切的初始特征列表，将使用处理后的所有列")
+                 logger.warning("无法从 DataProcessor 获取确切的初始特征列表,将使用处理后的所有列")
 
             # 确保只包含初始特征
             X_test_processed = X_test_processed[initial_features_pred]
             self.logger.info(f"数据处理完成处理后特征数量: {len(initial_features_pred)}")
         except Exception as e:
-            self.logger.exception("预测时数据处理阶段失败！")
+            self.logger.exception("预测时数据处理阶段失败!")
             return None
 
         # --- 步骤 4: 应用 AutoFE 转换 ---
@@ -362,10 +362,10 @@ class MLPipeline:
                  X_test_final = X_test_final[[col for col in final_train_columns if col in X_test_final.columns]]
                  self.logger.info("AutoFE 转换应用完成")
             except Exception as e:
-                self.logger.exception("预测时应用 AutoFE 转换失败！")
+                self.logger.exception("预测时应用 AutoFE 转换失败!")
                 return None
         else:
-            self.logger.info("步骤 4/5: 训练时未选中 AutoFE 特征，跳过转换")
+            self.logger.info("步骤 4/5: 训练时未选中 AutoFE 特征,跳过转换")
 
         # --- 步骤 5: 执行预测 ---
         self.logger.info("步骤 5/5: 使用加载的模型执行预测...")
@@ -374,9 +374,9 @@ class MLPipeline:
             predictions = automl_wrapper.predict(X_test_final)
             if predictions is None:
                  raise RuntimeError("AutoML wrapper predict 方法返回 None")
-            self.logger.info(f"预测完成，共生成 {len(predictions)} 个预测结果")
+            self.logger.info(f"预测完成,共生成 {len(predictions)} 个预测结果")
         except Exception as e:
-            self.logger.exception("执行预测失败！")
+            self.logger.exception("执行预测失败!")
             return None
 
         predict_end_time = time.time()

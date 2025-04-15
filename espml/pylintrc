@@ -2,18 +2,18 @@
 # 启动时使用 pylint --generate-rcfile > pylintrc 生成基础配置
 
 [MASTER]
-# 加载插件以支持常用库 (例如 Pydantic, Scikit-learn 等，如果使用)
+# 加载插件以支持常用库 (例如 Pydantic, Scikit-learn 等,如果使用)
 # load-plugins=
 
 # 使用所有可用检查器
 enable=all
 
-# 考虑禁用的检查 (谨慎禁用，仅当确实干扰或不适用时)
+# 考虑禁用的检查 (谨慎禁用,仅当确实干扰或不适用时)
 disable=
     missing-module-docstring, # 模块文档字符串 (建议后续添加)
     missing-class-docstring,  # 类文档字符串 (强制要求)
     missing-function-docstring, # 函数文档字符串 (强制要求)
-    invalid-name,             # 允许部分常用短变量名 (如 i, j, k, df, _, e, ax)，但需谨慎
+    invalid-name,             # 允许部分常用短变量名 (如 i, j, k, df, _, e, ax),但需谨慎
     fixme,                    # 允许 FIXME/TODO 注释
     logging-fstring-interpolation, # Loguru 通常使用 .format() 或 {}
     too-many-locals,          # 局部变量过多 (按需放宽阈值, 默认 15)

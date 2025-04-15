@@ -57,7 +57,7 @@ def pull_data_from_source(config: Dict[str, Any], source_id: Optional[str]):
     # 3. 查询或下载最新的 fans, tower, weather 数据文件
     # 4. 将文件保存到 const.RESOURCE_DIR
     # 5. 处理错误和日志
-    logger.warning(f"函数 'pull_data_from_source' 需要根据 exchange.py 的具体逻辑实现！")
+    logger.warning(f"函数 'pull_data_from_source' 需要根据 exchange.py 的具体逻辑实现!")
     # Placeholder
     success = False # 模拟失败
     # --- 实现结束 ---
@@ -76,7 +76,7 @@ def push_results_to_destination(config: Dict[str, Any], destination_id: Optional
     # 3. 连接到目标系统
     # 4. 上传文件或发送数据
     # 5. 处理错误和日志
-    logger.warning(f"函数 'push_results_to_destination' 需要根据 exchange.py 的具体逻辑实现！")
+    logger.warning(f"函数 'push_results_to_destination' 需要根据 exchange.py 的具体逻辑实现!")
     # Placeholder
     success = False
     # --- 实现结束 ---
@@ -93,7 +93,7 @@ def trigger_external_task(config: Dict[str, Any], task_id: Optional[str]):
     # 1. 从 config 获取外部调度系统或 API 的信息
     # 2. 发送触发请求
     # 3. 处理响应和错误
-    logger.warning(f"函数 'trigger_external_task' 需要根据 exchange.py 的具体逻辑实现！")
+    logger.warning(f"函数 'trigger_external_task' 需要根据 exchange.py 的具体逻辑实现!")
     # Placeholder
     success = False
     # --- 实现结束 ---
@@ -141,6 +141,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # 基本日志配置，以防万一
+    # 基本日志配置,以防万一
     logger.add(sys.stderr, level="INFO")
     main()

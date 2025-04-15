@@ -36,7 +36,7 @@ def sample_config_autofe() -> Dict[str, Any]:
             "Transforms": [{"name": "Lag", "params": {"periods": 1}}],
             "MaxFeaturesPerLayer": 10
         },
-        "Resource": {"MaxWorkers": 1} # 方便 mock，使用串行
+        "Resource": {"MaxWorkers": 1} # 方便 mock,使用串行
     }
 
 @pytest.fixture
@@ -50,9 +50,9 @@ def sample_data_autofe() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Seri
     return X_train, y_train, X_val, y_val
 
 # --- 测试 AutoFE 初始化 ---
-# (已在上次交互中提供并通过，此处省略)
+# (已在上次交互中提供并通过,此处省略)
 
-# --- 测试 AutoFE fit 方法 (核心流程，需要 mock 依赖) ---
+# --- 测试 AutoFE fit 方法 (核心流程,需要 mock 依赖) ---
 @patch('espml.autofe.autofe.Transform') # Mock Transform 类
 @patch('espml.autofe.autofe.feature_space') # Mock 工具函数
 @patch('espml.autofe.autofe.threads_feature_select') # Mock 算法函数

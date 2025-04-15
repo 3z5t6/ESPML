@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 性能报告生成模块 (espml)
-负责加载回测结果，计算性能指标，并生成汇总报告
+负责加载回测结果,计算性能指标,并生成汇总报告
 """
 
 import pandas as pd
@@ -40,7 +40,7 @@ def calculate_regression_metrics(y_true: pd.Series, y_pred: pd.Series) -> Dict[s
     df = df.replace([np.inf, -np.inf], np.nan).dropna()
 
     if df.empty:
-        logger.warning("计算指标时，有效数据为空所有指标将为 NaN")
+        logger.warning("计算指标时,有效数据为空所有指标将为 NaN")
         metrics = {k: np.nan for k in metrics} # 返回 NaN
         return metrics
 
@@ -55,7 +55,7 @@ def calculate_regression_metrics(y_true: pd.Series, y_pred: pd.Series) -> Dict[s
     except Exception as e: logger.error(f"计算 MAE 失败: {e}"); metrics['mae'] = np.nan
 
     try:
-        # MAPE: 仅对 true != 0 的点计算，避免除零
+        # MAPE: 仅对 true != 0 的点计算,避免除零
         mask = true != 0
         if np.any(mask):
              mape = np.mean(np.abs((true[mask] - pred[mask]) / true[mask])) * 100
@@ -92,7 +92,7 @@ def generate_backtest_report(
         generate_plots: 是否生成性能图表 (当前实现不包含绘图)
 
     Returns:
-        Optional[pd.DataFrame]: 包含每个回测文件及其指标的 DataFrame，如果失败则返回 None
+        Optional[pd.DataFrame]: 包含每个回测文件及其指标的 DataFrame,如果失败则返回 None
     """
     logger.info(f"开始生成回测性能报告 (模式: '{task_id_pattern}')...")
     pred_path = Path(pred_dir)
@@ -118,7 +118,7 @@ def generate_backtest_report(
              raise ValueError("实际功率文件的时间列未能成功解析为 DatetimeIndex")
         df_actual = df_actual.sort_index() # 确保排序
         if df_actual.empty: raise ValueError("实际功率文件为空或无法解析")
-        logger.info(f"实际功率数据加载完成，范围: [{df_actual.index.min()}, {df_actual.index.max()}]")
+        logger.info(f"实际功率数据加载完成,范围: [{df_actual.index.min()}, {df_actual.index.max()}]")
     except Exception as e:
         logger.exception(f"加载实际功率文件 '{fans_file}' 失败: {e}")
         return None
@@ -152,7 +152,7 @@ def generate_backtest_report(
 
             # 检查预测列
             if const.PREDICTION_COLUMN_NAME not in df_pred.columns:
-                 logger.error(f"文件 '{file_path.name}' 缺少列 '{const.PREDICTION_COLUMN_NAME}'，跳过")
+                 logger.error(f"文件 '{file_path.name}' 缺少列 '{const.PREDICTION_COLUMN_NAME}',跳过")
                  continue
 
             # 提取时间范围

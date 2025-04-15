@@ -17,7 +17,7 @@ import numpy as np
 from espml.util import utils as common_utils
 
 class EnhancedJSONEncoder(json.JSONEncoder):
-    """增强的 JSON 编码器，处理 dataclass 和 Path 对象"""
+    """增强的 JSON 编码器,处理 dataclass 和 Path 对象"""
     def default(self, o: Any) -> Any:
         if is_dataclass(o):
             return asdict(o)
@@ -67,7 +67,7 @@ class ModelVersionInfo:
         valid_keys = cls.__annotations__.keys()
         filtered_data = {k: v for k, v in data.items() if k in valid_keys}
         try:
-            # 可以添加类型转换逻辑，例如将 metrics 的值转为 float
+            # 可以添加类型转换逻辑,例如将 metrics 的值转为 float
             if 'performance_metrics' in filtered_data and isinstance(filtered_data['performance_metrics'], dict):
                 filtered_data['performance_metrics'] = {k: float(v) for k, v in filtered_data['performance_metrics'].items()}
             return cls(**filtered_data)
@@ -106,7 +106,7 @@ class IncrmlMetadata:
                          if isinstance(v_data, dict):
                               try: self.versions[str(v_id)] = ModelVersionInfo.from_dict(v_data)
                               except Exception as model_e: self.logger.error(f"加载版本 '{v_id}' 数据失败: {model_e}跳过")
-                         else: self.logger.warning(f"版本 '{v_id}' 数据非字典，跳过")
+                         else: self.logger.warning(f"版本 '{v_id}' 数据非字典,跳过")
                     self.logger.info(f"成功加载 {len(self.versions)} 个版本元数据当前版本: {self.current_version_id}")
                 except (TypeError, ValueError, KeyError) as e:
                     self.logger.error(f"元数据文件格式错误或内容无效: {e}初始化为空")
@@ -128,10 +128,10 @@ class IncrmlMetadata:
             'current_version_id': self.current_version_id,
             'versions': {v_id: v_info.to_dict() for v_id, v_info in self.versions.items()}
         }
-        # 使用 common_utils 写入 JSON，传入自定义 Encoder
+        # 使用 common_utils 写入 JSON,传入自定义 Encoder
         success = common_utils.write_json_file(data_to_save, self.metadata_file, indent=4, cls=EnhancedJSONEncoder)
         if success: self.logger.info(f"元数据成功保存共 {len(self.versions)} 个版本")
-        else: self.logger.error("保存元数据失败！")
+        else: self.logger.error("保存元数据失败!")
         return success
 
     def add_version(self, version_info: ModelVersionInfo, set_as_current: bool = True) -> None:
@@ -139,7 +139,7 @@ class IncrmlMetadata:
         if not isinstance(version_info, ModelVersionInfo): raise TypeError("version_info 必须是 ModelVersionInfo 实例")
         v_id = str(version_info.version_id);
         if not v_id: raise ValueError("版本 ID 不能为空")
-        if v_id in self.versions: self.logger.warning(f"版本 ID '{v_id}' 已存在，将被覆盖")
+        if v_id in self.versions: self.logger.warning(f"版本 ID '{v_id}' 已存在,将被覆盖")
         self.versions[v_id] = version_info
         self.logger.info(f"已添加/更新模型版本: {v_id}")
         if set_as_current: self.set_current_version(v_id)
@@ -156,7 +156,7 @@ class IncrmlMetadata:
         elif self.versions:
             try:
                 latest_version = sorted(self.versions.values(), key=lambda v: v.timestamp, reverse=True)[0]
-                self.logger.warning(f"当前版本 ID '{self.current_version_id}' 无效或未设置，返回最新版本: {latest_version.version_id}")
+                self.logger.warning(f"当前版本 ID '{self.current_version_id}' 无效或未设置,返回最新版本: {latest_version.version_id}")
                 return latest_version
             except (IndexError, Exception) as e: self.logger.error(f"查找最新版本时出错: {e}"); return None
         return None
@@ -165,7 +165,7 @@ class IncrmlMetadata:
         """设置当前活动/最佳版本的 ID"""
         v_id = str(version_id)
         if v_id not in self.versions:
-            self.logger.error(f"无法设置版本 '{v_id}' 为当前，因其不存在")
+            self.logger.error(f"无法设置版本 '{v_id}' 为当前,因其不存在")
             return False
         if self.current_version_id != v_id:
              self.current_version_id = v_id; self.logger.info(f"当前活动版本已设置为: {v_id}")

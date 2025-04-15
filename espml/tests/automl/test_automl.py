@@ -19,7 +19,7 @@ try:
     from flaml import AutoML as FlamlAutoMLClass # 用于类型检查和 mock
     FLAML_INSTALLED = True
 except ImportError:
-    pytest.skip("跳过 automl 测试，因为无法导入 flaml 或 FlamlAutomlWrapper", allow_module_level=True)
+    pytest.skip("跳过 automl 测试,因为无法导入 flaml 或 FlamlAutomlWrapper", allow_module_level=True)
     # 定义占位符以避免后续 NameError
     FlamlAutoMLClass = None
     FlamlAutomlWrapper = None
@@ -64,7 +64,7 @@ def sample_train_val_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.S
     return X_tr, y_tr, X_va, y_va
 
 # --- Mock flaml.AutoML ---
-# 将 mock 提升到 fixture，方便复用
+# 将 mock 提升到 fixture,方便复用
 @pytest.fixture
 def mock_flaml(mocker) -> MagicMock:
     """创建一个模拟的 flaml.AutoML 类"""
@@ -111,7 +111,7 @@ def test_automl_wrapper_init(sample_automl_config: Dict[str, Any], sample_global
 def test_automl_wrapper_init_no_global():
     """测试缺少全局配置的情况"""
     config = {"TimeBudget": 10} # 只有 AutoML 配置
-    # 初始化时不应报错，应使用默认值
+    # 初始化时不应报错,应使用默认值
     wrapper = FlamlAutomlWrapper(config=config, global_config=None)
     assert wrapper.metric == 'rmse' # 默认值
     assert wrapper.task_type == 'regression'

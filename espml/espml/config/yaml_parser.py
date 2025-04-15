@@ -26,12 +26,12 @@ def load_yaml_config(
 
     Args:
         config_path (Union[str, Path]): YAML 配置文件的完整路径
-        section (Optional[str]): (可选) 如果提供，则只返回 YAML 文件中以此为键的顶级部分
-                                    如果为 None，则返回整个配置字典
-        encoding (str): 读取文件时使用的编码，默认为 'utf-8'
+        section (Optional[str]): (可选) 如果提供,则只返回 YAML 文件中以此为键的顶级部分
+                                    如果为 None,则返回整个配置字典
+        encoding (str): 读取文件时使用的编码,默认为 'utf-8'
 
     Returns:
-        Dict[str, Any]: 解析后的配置字典如果指定了 section，则返回该部分的字典
+        Dict[str, Any]: 解析后的配置字典如果指定了 section,则返回该部分的字典
 
     Raises:
         ConfigError: 如果文件不存在、不是有效的 YAML、顶层不是字典、
@@ -45,8 +45,8 @@ def load_yaml_config(
 
     if not config_file.is_file():
         logger.error(f"配置文件未找到: {config_file}")
-        # 这里会由 Pathlib 引发 FileNotFoundError，无需手动引发
-        # 但为了明确，可以在上层捕获 FileNotFoundError 并包装为 ConfigError
+        # 这里会由 Pathlib 引发 FileNotFoundError,无需手动引发
+        # 但为了明确,可以在上层捕获 FileNotFoundError 并包装为 ConfigError
         raise FileNotFoundError(f"配置文件未找到: {config_file}")
 
     try:
@@ -55,7 +55,7 @@ def load_yaml_config(
             full_config = yaml.safe_load(f)
 
         if not isinstance(full_config, dict):
-            logger.error(f"配置文件顶层结构必须是字典，但得到的是 {type(full_config)}: {config_file}")
+            logger.error(f"配置文件顶层结构必须是字典,但得到的是 {type(full_config)}: {config_file}")
             raise ConfigError(f"配置文件顶层结构必须是字典: {config_file}")
 
         logger.info(f"成功加载配置文件: {config_file}")
@@ -65,7 +65,7 @@ def load_yaml_config(
             if section in full_config:
                 section_config = full_config[section]
                 if not isinstance(section_config, dict):
-                     logger.warning(f"配置部分 '{section}' 的值不是字典 (类型: {type(section_config)})，将按原样返回")
+                     logger.warning(f"配置部分 '{section}' 的值不是字典 (类型: {type(section_config)}),将按原样返回")
                 return section_config
             else:
                 logger.error(f"在配置文件 {config_file} 中未找到指定的顶级部分: '{section}'")

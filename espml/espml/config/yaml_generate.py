@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 from typing import Dict, Any, List, Union
 
-# 添加项目根目录到路径，以便导入 const
+# 添加项目根目录到路径,以便导入 const
 script_dir = Path(__file__).parent.resolve()
 project_root = script_dir.parent # config 目录的上一级是项目根目录
 sys.path.insert(0, str(project_root))
@@ -85,9 +85,9 @@ DEFAULT_PROJECT_CONFIG: Dict[str, Any] = {
         "PowerCurveParams": {"min_wind_speed": 3.0, "max_wind_speed": 25.0, "invalid_power_threshold_kw": 10.0, "overload_ratio": 1.1},
         "OutlierMethodWindSpeed": "Range",
         "WindSpeedRangeParams": {"min_value": 0.0, "max_value": 50.0},
-        "StuckSensorWindow": 4, # 启用卡死检测，窗口 1 小时
+        "StuckSensorWindow": 4, # 启用卡死检测,窗口 1 小时
         "StuckSensorThreshold": 1e-6,
-        "StdOutlierWindow": 96, # 启用滚动标准差检测，窗口 1 天
+        "StdOutlierWindow": 96, # 启用滚动标准差检测,窗口 1 天
         "StdOutlierThreshold": 3.0,
         "EnableIcingDetection": False, # 默认不启用结冰检测
         "IcingParams": {"temp_threshold": 0.0, "rh_threshold": 90.0, "power_deviation_threshold": -0.15},
@@ -136,11 +136,11 @@ DEFAULT_PROJECT_CONFIG: Dict[str, Any] = {
              "DriftLevelFactor": 3.0,
              # "ErrorThreshold": 0.1 # For regression drift input
         },
-        # "ScheduleCron": null # 如果 Trigger=Scheduled，需要设置
+        # "ScheduleCron": null # 如果 Trigger=Scheduled,需要设置
     },
     "Resource": {
         "trainingServicePlatform": "local",
-        "MaxWorkers": -1, # 并行计算 worker 数量，-1 代表 CPU 核心数
+        "MaxWorkers": -1, # 并行计算 worker 数量,-1 代表 CPU 核心数
         "EnableDataCache": True, # 是否启用数据读取缓存
         "DowncastDataTypes": False # 是否在特征工程后降低数据类型精度
     },
@@ -202,7 +202,7 @@ DEFAULT_TASK_CONFIG: Dict[str, List[Dict[str, Any]]] = {
             "backtrack_end_date": "2024-01-31",   # 回测结束日期
             "backtrack_time_of_day": "07:20:00", # 模拟预测时间点
             "backtrack_retrain": True, # 每次都重新训练
-            # 回测的模型/状态保存路径模式 (可选，如果需要保存)
+            # 回测的模型/状态保存路径模式 (可选,如果需要保存)
             # "backtrack_model_path_pattern": "data/backtrack_models/{task_id}/{date_YYYYMMDD}_{time_HHMMSS}",
             # 回测使用独立的窗口偏移量
             "backtrack_train_start_offset": "-180D",
@@ -224,7 +224,7 @@ def generate_default_config(output_dir: Union[str, Path], force_overwrite: bool 
 
     Args:
         output_dir (Union[str, Path]): 输出目录 (例如 espml/project/WindPower)
-        force_overwrite (bool): 如果文件已存在，是否强制覆盖
+        force_overwrite (bool): 如果文件已存在,是否强制覆盖
     """
     output_path = Path(output_dir)
     # 使用 common_utils 创建目录
@@ -244,12 +244,12 @@ def generate_default_config(output_dir: Union[str, Path], force_overwrite: bool 
 
     for file_path, default_data in files_to_generate.items():
         if file_path.exists() and not force_overwrite:
-            print(f"文件已存在，跳过生成: {file_path}")
+            print(f"文件已存在,跳过生成: {file_path}")
             continue
         print(f"正在生成默认配置文件: {file_path}")
         try:
             with open(file_path, 'w', encoding='utf-8') as f:
-                # 使用 PyYAML 的 dump 函数，设置允许 Unicode 和缩进
+                # 使用 PyYAML 的 dump 函数,设置允许 Unicode 和缩进
                 yaml.dump(default_data, f, allow_unicode=True, indent=4, sort_keys=False)
             print(f"成功生成: {file_path}")
         except Exception as e:

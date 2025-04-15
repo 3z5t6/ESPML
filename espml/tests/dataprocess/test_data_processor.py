@@ -45,9 +45,9 @@ def full_valid_config_dict(fixtures_dir: Path) -> Dict[str, Any]:
             "TaskType": "regression", "TargetName": "label", "TimeIndex": "datetime",
             "TimeFormat": "%Y-%m-%d %H:%M:%S", "TimeFrequency": "15min",
             "CapacityKW": 1500.0, # 匹配 sample_fans.csv
-            "IgnoreFeature": ["ID"], # ID 列不存在于示例数据中，但测试配置存在性
+            "IgnoreFeature": ["ID"], # ID 列不存在于示例数据中,但测试配置存在性
             "CategoricalFeature": [], # 示例数据无明确分类特征需要传递
-            "ReferenceHeight": 70.0, # 设置参考高度，等于塔高，无需调整塔风速
+            "ReferenceHeight": 70.0, # 设置参考高度,等于塔高,无需调整塔风速
             "TimeWindowLags": [1, 2, 4], # 测试滞后
             "TimeWindowRolling": { # 测试滚动
                  "label": {"windows": [4], "aggs": ["mean", "std"]},
@@ -164,9 +164,9 @@ def test_resample_and_align_empty(processor: DataProcessor):
 
 # --- 测试 _merge_data_sources (包括高度调整) ---
 def test_merge_data_sources_with_height_adjust(full_valid_config_dict: Dict[str, Any], setup_temp_data_dir: Path):
-    """测试合并数据，特别是包含风速高度调整"""
+    """测试合并数据,特别是包含风速高度调整"""
     config = full_valid_config_dict.copy()
-    # 修改配置，使塔高与参考高度不同，天气预报高度也不同
+    # 修改配置,使塔高与参考高度不同,天气预报高度也不同
     config['DataSource']['TowerHeight'] = 10.0 # 塔高 10 米
     config['Feature']['ReferenceHeight'] = 70.0 # 参考高度 70 米
     config['DataSource']['WeatherWindSpeedHeight'] = 10.0 # 天气预报也是 10 米
@@ -225,16 +225,16 @@ def test_clean_data_pipeline(processor: DataProcessor, df_to_clean: pd.DataFrame
     assert df_cleaned.loc['2024-01-01 00:30:00', const.INTERNAL_TOWER_WS_COL] <= 50.0
     assert df_cleaned.loc['2024-01-01 01:15:00', processor.internal_target_col] >= 0
     # 3. 检查功率曲线过滤（点 2024-01-01 01:00:00）
-    # 由于后续插值，无法直接断言为 NaN，但值应该不是 50
+    # 由于后续插值,无法直接断言为 NaN,但值应该不是 50
     assert df_cleaned.loc['2024-01-01 01:00:00', processor.internal_target_col] != 50.0
     # 4. 检查卡死数据（湿度列在 00:45 到 01:30 之间）
-    # filter_stuck_sensor 会产生 NaN，然后被插值
+    # filter_stuck_sensor 会产生 NaN,然后被插值
     humidity_slice = df_cleaned.loc['2024-01-01 00:45':'2024-01-01 01:30', const.INTERNAL_TOWER_HUM_COL]
-    # 如果被标记为 NaN 并插值，值应该不再是恒定的 85.0（除非周围值恰好也是 85）
+    # 如果被标记为 NaN 并插值,值应该不再是恒定的 85.0（除非周围值恰好也是 85）
     assert not np.all(np.isclose(humidity_slice.values, 85.0)) # 验证值已改变
 
 # --- 测试 _engineer_features (详细测试各种特征生成) ---
-# 使用 processor fixture，它有完整的配置
+# 使用 processor fixture,它有完整的配置
 def test_engineer_features_output(processor: DataProcessor, df_to_clean: pd.DataFrame):
     """测试特征工程的最终输出列和大致内容"""
     df_cleaned = processor._clean_merged_data(df_to_clean)
@@ -261,7 +261,7 @@ def test_engineer_features_output(processor: DataProcessor, df_to_clean: pd.Data
 
 # --- 测试主 process 方法 (端到端) ---
 def test_process_full_run(full_valid_config_dict: Dict[str, Any], setup_temp_data_dir: Path):
-    """测试完整的 process 方法，从加载到特征工程"""
+    """测试完整的 process 方法,从加载到特征工程"""
     config = full_valid_config_dict.copy()
     config['DataSource']['dir'] = str(setup_temp_data_dir / "resource")
     processor = DataProcessor(config=config)

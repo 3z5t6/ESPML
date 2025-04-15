@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 增量学习数据采样模块 (espml)
-包含用于增量学习的数据选择策略，例如 iCaRL 样本集管理或时间窗口采样
+包含用于增量学习的数据选择策略,例如 iCaRL 样本集管理或时间窗口采样
 """
 
 import pandas as pd
@@ -45,20 +45,20 @@ class WindowSampler(BaseSampler):
     """基于滑动时间窗口选择数据"""
     def __init__(self, config: Dict[str, Any], logger_instance: Any):
         super().__init__(config, logger_instance)
-        # 假设参数在 config 中，键名为 'WindowSize'
+        # 假设参数在 config 中,键名为 'WindowSize'
         self.window_size = self.config.get('WindowSize', '90D')
         # 验证窗口大小格式
         try:
              pd.Timedelta(self.window_size)
         except ValueError:
              raise ValueError(f"无效的时间窗口配置 'WindowSize': {self.window_size}")
-        self.logger.info(f"WindowSampler 初始化，窗口大小: {self.window_size}")
+        self.logger.info(f"WindowSampler 初始化,窗口大小: {self.window_size}")
 
     def select_data(self, available_data: pd.DataFrame, current_model_metadata: Optional[Dict] = None, previous_model_metadata: Optional[Dict] = None) -> pd.DataFrame:
         """选择指定时间窗口内的数据"""
         self.logger.info(f"使用时间窗口 '{self.window_size}' 选择数据...")
         if available_data.empty:
-             self.logger.warning("可用数据为空，无法进行窗口采样")
+             self.logger.warning("可用数据为空,无法进行窗口采样")
              return available_data
         if not isinstance(available_data.index, pd.DatetimeIndex):
              raise ValueError("WindowSampler 需要 DataFrame 具有 DatetimeIndex")
@@ -72,12 +72,12 @@ class WindowSampler(BaseSampler):
         if selected_data.empty:
             self.logger.warning(f"时间窗口 [{start_time}, {end_time}] 内没有数据")
         else:
-            self.logger.info(f"窗口采样完成，选中数据范围: [{selected_data.index.min()}, {selected_data.index.max()}], 行数: {len(selected_data)} / {len(available_data)}")
+            self.logger.info(f"窗口采样完成,选中数据范围: [{selected_data.index.min()}, {selected_data.index.max()}], 行数: {len(selected_data)} / {len(available_data)}")
         return selected_data
 
     def update_state(self, new_data_processed: pd.DataFrame, combined_training_data: pd.DataFrame, new_model_metadata: Dict) -> Optional[Dict]:
         """WindowSampler 是无状态的"""
-        # self.logger.trace("WindowSampler 无状态，无需更新")
+        # self.logger.trace("WindowSampler 无状态,无需更新")
         return None
 
 
@@ -90,7 +90,7 @@ class ExemplarSampler(BaseSampler):
         if self.max_exemplar_set_size <= 0: self.max_exemplar_set_size = 0
         self.selection_strategy = self.config.get('ExemplarSelectionStrategy', 'random').lower()
         self.exemplar_set: Optional[pd.DataFrame] = None
-        self.logger.info(f"ExemplarSampler 初始化，最大样本数: {self.max_exemplar_set_size}, 选择策略: {self.selection_strategy}")
+        self.logger.info(f"ExemplarSampler 初始化,最大样本数: {self.max_exemplar_set_size}, 选择策略: {self.selection_strategy}")
 
     def _load_exemplar_set(self, metadata: Optional[Dict]) -> None:
         """(内部) 从元数据路径加载样本集"""
@@ -110,13 +110,13 @@ class ExemplarSampler(BaseSampler):
                        datetime_index = pd.to_datetime(self.exemplar_set['index'], errors='coerce')
                        if datetime_index.notna().all():
                            self.exemplar_set = self.exemplar_set.set_index(datetime_index).drop(columns=['index'])
-                       else: # 如果不是日期时间，作为普通索引
+                       else: # 如果不是日期时间,作为普通索引
                             self.exemplar_set = self.exemplar_set.set_index('index')
                        # 检查索引类型
                        if not isinstance(self.exemplar_set.index, pd.DatetimeIndex):
                            self.logger.warning(f"恢复的样本集索引类型不是 DatetimeIndex ({self.exemplar_set.index.dtype})")
 
-                  self.logger.info(f"成功加载样本集，形状: {self.exemplar_set.shape}")
+                  self.logger.info(f"成功加载样本集,形状: {self.exemplar_set.shape}")
              except ImportError: self.logger.error("加载 Feather 失败需安装 'pyarrow'"); self.exemplar_set = None
              except Exception as e: self.logger.exception(f"加载样本集文件 '{path}' 失败: {e}"); self.exemplar_set = None
         else: self.logger.error(f"样本集文件不存在: {path}")
@@ -143,26 +143,26 @@ class ExemplarSampler(BaseSampler):
         pool_size = len(combined_pool)
         if pool_size <= self.max_exemplar_set_size: return combined_pool.sort_index()
 
-        self.logger.info(f"样本池大小 ({pool_size}) 超过限制 ({self.max_exemplar_set_size})，执行缩减 (策略: {self.selection_strategy})...")
+        self.logger.info(f"样本池大小 ({pool_size}) 超过限制 ({self.max_exemplar_set_size}),执行缩减 (策略: {self.selection_strategy})...")
         if self.selection_strategy == 'random':
             indices_to_keep = np.random.choice(combined_pool.index, self.max_exemplar_set_size, replace=False)
             reduced_set = combined_pool.loc[indices_to_keep].sort_index()
         elif self.selection_strategy == 'herding':
-            self.logger.warning("iCaRL Herding 样本选择策略需要模型信息，当前版本使用随机采样代替！")
+            self.logger.warning("iCaRL Herding 样本选择策略需要模型信息,当前版本使用随机采样代替!")
             indices_to_keep = np.random.choice(combined_pool.index, self.max_exemplar_set_size, replace=False)
             reduced_set = combined_pool.loc[indices_to_keep].sort_index()
         else: # 默认或未知策略
-             self.logger.warning(f"不支持的样本选择策略: {self.selection_strategy}，使用随机采样")
+             self.logger.warning(f"不支持的样本选择策略: {self.selection_strategy},使用随机采样")
              indices_to_keep = np.random.choice(combined_pool.index, self.max_exemplar_set_size, replace=False)
              reduced_set = combined_pool.loc[indices_to_keep].sort_index()
-        self.logger.info(f"样本集缩减完成，最终大小: {reduced_set.shape}")
+        self.logger.info(f"样本集缩减完成,最终大小: {reduced_set.shape}")
         return reduced_set
 
     def select_data(self, available_data: pd.DataFrame, current_model_metadata: Optional[Dict] = None, previous_model_metadata: Optional[Dict] = None) -> pd.DataFrame:
         """选择新数据和旧样本集的组合"""
         self.logger.info("使用样本集策略选择数据...")
         if self.max_exemplar_set_size <= 0: # 如果禁用样本集
-             self.logger.info("样本集已禁用，只使用新数据")
+             self.logger.info("样本集已禁用,只使用新数据")
              return available_data.copy()
 
         # 1. 加载旧样本集
@@ -175,14 +175,14 @@ class ExemplarSampler(BaseSampler):
                   # 优先保留 available_data 的列
                   common_cols = available_data.columns.intersection(self.exemplar_set.columns)
                   if len(common_cols) < len(self.exemplar_set.columns):
-                       logger.warning(f"样本集中的部分列在新数据中不存在，将被丢弃: {set(self.exemplar_set.columns) - set(common_cols)}")
+                       logger.warning(f"样本集中的部分列在新数据中不存在,将被丢弃: {set(self.exemplar_set.columns) - set(common_cols)}")
                   if len(common_cols) < len(available_data.columns):
                       logger.warning(f"新数据中的部分列在样本集中不存在: {set(available_data.columns) - set(common_cols)}")
 
                   exemplars_aligned = self.exemplar_set[common_cols]
                   available_data_aligned = available_data[common_cols]
 
-                  # 合并，保留新数据处理重复索引
+                  # 合并,保留新数据处理重复索引
                   selected_data = pd.concat([exemplars_aligned, available_data_aligned], ignore_index=False)
                   selected_data = selected_data[~selected_data.index.duplicated(keep='last')]
                   selected_data = selected_data.sort_index()
@@ -191,7 +191,7 @@ class ExemplarSampler(BaseSampler):
                   self.logger.error(f"合并新数据和样本集失败: {e}将只使用新数据", exc_info=True)
                   selected_data = available_data.copy()
         else:
-             self.logger.info("样本集为空或加载失败，只使用新数据")
+             self.logger.info("样本集为空或加载失败,只使用新数据")
              selected_data = available_data.copy()
 
         return selected_data
@@ -212,7 +212,7 @@ class ExemplarSampler(BaseSampler):
              )
              pool_for_selection = pool_for_selection[~pool_for_selection.index.duplicated(keep='last')]
         else:
-             pool_for_selection = new_data_processed.copy() # 如果没有旧样本，直接用新数据
+             pool_for_selection = new_data_processed.copy() # 如果没有旧样本,直接用新数据
 
         # 执行缩减
         self.exemplar_set = self._reduce_exemplar_set(pool_for_selection)
@@ -234,13 +234,13 @@ def get_sampler(config: Dict[str, Any], logger_instance: Any) -> BaseSampler:
     logger_instance.info(f"根据配置获取数据采样器 (IncrML Method: '{incrml_method}')...")
 
     if incrml_method == 'icarl':
-        logger_instance.info("检测到 iCaRL 方法，使用 ExemplarSampler")
+        logger_instance.info("检测到 iCaRL 方法,使用 ExemplarSampler")
         return ExemplarSampler(sampling_config, logger_instance)
     elif incrml_method == 'window':
-        logger_instance.info("检测到 window 方法或默认，使用 WindowSampler")
+        logger_instance.info("检测到 window 方法或默认,使用 WindowSampler")
         return WindowSampler(sampling_config, logger_instance)
     else:
-        logger_instance.warning(f"未知的增量学习方法 '{incrml_method}'，将使用默认的 WindowSampler")
+        logger_instance.warning(f"未知的增量学习方法 '{incrml_method}',将使用默认的 WindowSampler")
         return WindowSampler({}, logger_instance) # 使用空配置
 
 

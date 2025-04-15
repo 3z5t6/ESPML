@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 增量学习管理器模块 (espml)
-负责协调元数据、数据采样、漂移检测，并根据触发条件执行增量更新流程
+负责协调元数据、数据采样、漂移检测,并根据触发条件执行增量更新流程
 """
 
 import datetime
@@ -32,7 +32,7 @@ try:
     from croniter import croniter
     CRONITER_INSTALLED = True
 except ImportError:
-    logger.warning("库 'croniter' 未安装，基于 Cron 的增量学习触发器将不可用")
+    logger.warning("库 'croniter' 未安装,基于 Cron 的增量学习触发器将不可用")
     croniter = None # type: ignore
     CRONITER_INSTALLED = False
 
@@ -79,7 +79,7 @@ class IncrmlManager:
         try:
             self.metadata = IncrmlMetadata(task_id=self.task_id, metadata_dir=self.metadata_dir)
         except Exception as e:
-             self.logger.exception("初始化 IncrmlMetadata 失败！")
+             self.logger.exception("初始化 IncrmlMetadata 失败!")
              raise RuntimeError("无法初始化元数据管理器") from e
 
         # 2. 数据采样器
@@ -89,7 +89,7 @@ class IncrmlManager:
             if self.sampler: self.logger.info(f"数据采样器已初始化: {type(self.sampler).__name__}")
             else: self.logger.warning("无法根据配置初始化数据采样器")
         except Exception as e:
-             self.logger.exception("初始化数据采样器失败！")
+             self.logger.exception("初始化数据采样器失败!")
              self.sampler = None # 初始化失败
 
         # 3. 漂移检测器 (仅当需要时初始化)
@@ -98,12 +98,12 @@ class IncrmlManager:
             drift_detection_config = self.incrml_config.get('DriftDetection', {})
             if drift_detection_config.get('Enabled', False):
                  try:
-                     # 将整个项目配置传递给 get_drift_detector，因为它可能需要 IncrML 配置
+                     # 将整个项目配置传递给 get_drift_detector,因为它可能需要 IncrML 配置
                      self.drift_detector = get_drift_detector(self.config, self.logger)
                      if self.drift_detector: self.logger.info("漂移检测器已初始化")
-                     else: self.logger.error("根据配置未能初始化漂移检测器！")
+                     else: self.logger.error("根据配置未能初始化漂移检测器!")
                  except Exception as e:
-                      self.logger.exception("初始化漂移检测器失败！")
+                      self.logger.exception("初始化漂移检测器失败!")
                       self.drift_detector = None
             else:
                  self.logger.warning("触发器配置为 'OnDriftDetected' 但漂移检测未启用")
@@ -147,9 +147,9 @@ class IncrmlManager:
                     # else: self.logger.trace("无新数据")
                 except Exception as e:
                      self.logger.error(f"解析上次训练时间戳失败: {e}假定需要更新")
-                     triggered = True # 时间戳无效，触发更新
-            else: # 没有历史记录，触发
-                 self.logger.info("触发 (OnDataFileIncrease): 无历史记录，执行首次训练/更新")
+                     triggered = True # 时间戳无效,触发更新
+            else: # 没有历史记录,触发
+                 self.logger.info("触发 (OnDataFileIncrease): 无历史记录,执行首次训练/更新")
                  triggered = True
 
         # --- Scheduled 逻辑  ---
@@ -165,14 +165,14 @@ class IncrmlManager:
                  # 需要上次运行时间来判断 Cron 是否到期
                  # 假设上次运行时间存储在元数据中或外部传入
                  last_run_time_str = current_version_info.timestamp if current_version_info else None
-                 # 简化如果当前时间 >= Cron 表达式的下一个时间点（基于某个基准，如上次运行）
-                 # 这种判断在 manager 内部不完美，最好由外部调度器完成
-                 # 此处仅作演示，实际应依赖外部调度
+                 # 简化如果当前时间 >= Cron 表达式的下一个时间点（基于某个基准,如上次运行）
+                 # 这种判断在 manager 内部不完美,最好由外部调度器完成
+                 # 此处仅作演示,实际应依赖外部调度
                  # base_time = pd.to_datetime(last_run_time_str) if last_run_time_str else datetime.datetime.now() - datetime.timedelta(days=1) # 假设基准是昨天
                  # cron = croniter(schedule_cron, start_time=base_time)
                  # next_run = cron.get_next(datetime.datetime)
                  # if datetime.datetime.now() >= next_run: triggered = True
-                 self.logger.warning("内部 Cron 触发检查逻辑不精确，依赖外部调度调用 update")
+                 self.logger.warning("内部 Cron 触发检查逻辑不精确,依赖外部调度调用 update")
                  triggered = False # 假设由外部决定是否调用 update
 
             except Exception as e:
@@ -197,9 +197,9 @@ class IncrmlManager:
                 # 假设需要计算预测是否正确 (需要知道任务类型和阈值)
                 # : 此计算逻辑应该与代码一致
                 errors = 0
-                # 此处简化为直接比较（假设分类），实际应更复杂
-                # 需要将 _calculate_metric 移到可调用的地方，或者在此处重新实现
-                # 假设任务是回归，使用简单阈值判断
+                # 此处简化为直接比较（假设分类）,实际应更复杂
+                # 需要将 _calculate_metric 移到可调用的地方,或者在此处重新实现
+                # 假设任务是回归,使用简单阈值判断
                 if self.task_type == 'regression':
                     error_threshold = self.incrml_config.get('DriftDetection', {}).get('ErrorThreshold', 0.1)
                     absolute_error = np.abs(current_predictions - current_ground_truth)
@@ -212,10 +212,10 @@ class IncrmlManager:
                 for is_correct in correct_predictions:
                     self.drift_detector.add_element(is_correct)
                     if self.drift_detector.detected_change(): # 检查是否达到漂移状态
-                        self.logger.info(f"触发 (OnDriftDetected): 检测到概念漂移！")
+                        self.logger.info(f"触发 (OnDriftDetected): 检测到概念漂移!")
                         triggered = True
                         break # 已触发
-                # 即使没触发漂移，也记录一下警告状态
+                # 即使没触发漂移,也记录一下警告状态
                 if not triggered and self.drift_detector.detected_warning_zone():
                      self.logger.info("漂移检测器处于警告状态")
 
@@ -241,7 +241,7 @@ class IncrmlManager:
         """
         self.logger.info("开始准备增量学习数据...")
         if self.sampler is None:
-            self.logger.warning("数据采样器未初始化，将使用所有可用数据")
+            self.logger.warning("数据采样器未初始化,将使用所有可用数据")
             return available_df.copy()
 
         # 获取上一个版本的元数据字典
@@ -258,12 +258,12 @@ class IncrmlManager:
                 previous_model_metadata=prev_meta_dict
             )
             if selected_data.empty:
-                 self.logger.warning("采样器返回了空的数据集！")
+                 self.logger.warning("采样器返回了空的数据集!")
             else:
-                 self.logger.info(f"数据准备完成，选中数据形状: {selected_data.shape}")
+                 self.logger.info(f"数据准备完成,选中数据形状: {selected_data.shape}")
             return selected_data
         except Exception as e:
-             self.logger.exception("数据采样失败！将返回所有可用数据作为后备")
+             self.logger.exception("数据采样失败!将返回所有可用数据作为后备")
              return available_df.copy()
 
     # 使用计时器
@@ -284,9 +284,9 @@ class IncrmlManager:
         Returns:
             bool: 增量更新是否成功
         """
-        if not self.enabled: self.logger.error("尝试执行 update 但增量学习未启用！"); return False
+        if not self.enabled: self.logger.error("尝试执行 update 但增量学习未启用!"); return False
         if not isinstance(ml_pipeline, MLPipeline): raise TypeError("'ml_pipeline' 必须是 MLPipeline 实例")
-        if incrml_train_df.empty: self.logger.error("用于增量更新的数据为空！"); return False
+        if incrml_train_df.empty: self.logger.error("用于增量更新的数据为空!"); return False
 
         self.logger.info(f"开始执行增量模型更新 (任务: {self.task_id}, 方法: {self.method})...")
         self.logger.info(f"用于本次更新的数据形状: {incrml_train_df.shape}")
@@ -297,10 +297,10 @@ class IncrmlManager:
         self.logger.info(f"新模型版本 ID: {new_version_id}")
 
         # 2. 执行训练 (调用 MLPipeline.train)
-        # 直接调用 train，不修改配置（除非代码明确修改了）
+        # 直接调用 train,不修改配置（除非代码明确修改了）
         # iCaRL 的特殊逻辑（如蒸馏）需要 MLPipeline 或其内部组件支持
         if self.method == 'icarl':
-             self.logger.warning("检测到 iCaRL 方法，但当前 update 实现未包含特定的 iCaRL 逻辑（如知识蒸馏），"
+             self.logger.warning("检测到 iCaRL 方法,但当前 update 实现未包含特定的 iCaRL 逻辑（如知识蒸馏）,"
                                "假设此逻辑在 MLPipeline.train 或相关组件内部处理")
              # 可能需要传递旧模型信息给 train
              # old_model_info = self.metadata.get_current_version()
@@ -312,13 +312,13 @@ class IncrmlManager:
         )
 
         if not training_successful:
-            self.logger.error("MLPipeline.train 执行失败，增量更新终止")
+            self.logger.error("MLPipeline.train 执行失败,增量更新终止")
             return False
 
         # 3. 获取训练结果和路径 (严格依赖 ml_pipeline 的实现)
         self.logger.debug("尝试从 MLPipeline 获取训练结果...")
         # 假设 ml_pipeline 暴露了获取最新运行结果的方法或属性
-        # 这是目前设计的一个潜在弱点，ml_pipeline 需要支持返回这些信息
+        # 这是目前设计的一个潜在弱点,ml_pipeline 需要支持返回这些信息
         try:
             # 使用 ml_pipeline 内部方法获取路径 (更健壮)
             model_path, tf_path, feat_path, _ = ml_pipeline._get_run_specific_paths(new_version_id)
@@ -342,7 +342,7 @@ class IncrmlManager:
             self.logger.info(f"获取训练结果成功模型: {model_path}, 性能: {performance}, 新特征数: {len(final_selected_features)}")
 
         except AttributeError:
-            self.logger.error("无法从 MLPipeline 实例获取必要的训练结果（路径或性能），元数据将不完整！")
+            self.logger.error("无法从 MLPipeline 实例获取必要的训练结果（路径或性能）,元数据将不完整!")
             # 根据代码决定是继续还是失败
             return False # 假设无法获取结果则失败
         except Exception as e:
@@ -385,22 +385,22 @@ class IncrmlManager:
                       new_version_info.misc_info.update({k:v for k,v in sampler_state_update.items() if k != 'exemplar_set_path'})
              except Exception as sampler_e:
                   self.logger.exception(f"更新采样器状态时出错: {sampler_e}")
-                  # 不应因此失败整个更新，但需记录
-        else: self.logger.debug("采样器未初始化，跳过状态更新")
+                  # 不应因此失败整个更新,但需记录
+        else: self.logger.debug("采样器未初始化,跳过状态更新")
 
         # 6. 添加新版本元数据并保存
         try:
             self.metadata.add_version(new_version_info, set_as_current=True) # 添加并设为当前
             save_ok = self.metadata.save()
             if not save_ok: raise RuntimeError("元数据保存失败")
-            self.logger.success(f"增量模型更新成功完成！新版本 ID: {new_version_id}")
+            self.logger.success(f"增量模型更新成功完成!新版本 ID: {new_version_id}")
         except Exception as meta_e:
              self.logger.exception(f"添加或保存新版本元数据时失败: {meta_e}")
              return False # 元数据失败是严重问题
 
         # 7. 重置漂移检测器 (假设漂移后需要重置)
         if self.drift_detector and self.drift_detector.detected_change():
-             self.logger.info("检测到漂移，正在重置漂移检测器状态...")
+             self.logger.info("检测到漂移,正在重置漂移检测器状态...")
              try:
                  self.drift_detector._reset()
              except Exception as reset_e:

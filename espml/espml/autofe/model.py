@@ -60,7 +60,7 @@ def _calculate_metric(metric_name: str, y_true: pd.Series, y_pred: np.ndarray) -
     elif metric_name == 'accuracy': # 分类标签
         return accuracy_score(y_true, y_pred)
     elif metric_name == 'f1': # 分类标签
-        # 需要指定 average 参数，与代码保持一致，此处假设 'weighted'
+        # 需要指定 average 参数,与代码保持一致,此处假设 'weighted'
         return f1_score(y_true, y_pred, average='weighted')
     # 可以添加 MAE 等其他代码支持的指标
     # elif metric_name == 'mae':
@@ -121,10 +121,10 @@ def evaluate_feature_importance(
          logger.error("EVAL: X_train 和 y_train 索引不匹配")
          return -np.inf, 0.0
     if new_feature.isna().all():
-         logger.trace(f"EVAL: 新特征 '{feature_name}' 全为 NaN，评估无效")
+         logger.trace(f"EVAL: 新特征 '{feature_name}' 全为 NaN,评估无效")
          return -np.inf, 0.0
     if not new_feature.index.equals(X_train.index):
-        logger.warning(f"EVAL: 新特征 '{feature_name}' 索引与训练数据不匹配，尝试重新对齐...")
+        logger.warning(f"EVAL: 新特征 '{feature_name}' 索引与训练数据不匹配,尝试重新对齐...")
         try:
              new_feature = new_feature.reindex(X_train.index)
              if new_feature.isna().all():
@@ -154,10 +154,10 @@ def evaluate_feature_importance(
         X_combined = X_combined.fillna(0).astype(float)
         # 检查填充后是否还有 Inf 或过大/过小的值
         if not np.all(np.isfinite(X_base.values)):
-             logger.warning("EVAL: 填充 NaN 后基础特征中仍存在非有限值，评估可能失败")
+             logger.warning("EVAL: 填充 NaN 后基础特征中仍存在非有限值,评估可能失败")
              # 可以选择替换 Inf: X_base = X_base.replace([np.inf, -np.inf], 0)
         if not np.all(np.isfinite(X_combined.values)):
-             logger.warning("EVAL: 填充 NaN 后组合特征中仍存在非有限值，评估可能失败")
+             logger.warning("EVAL: 填充 NaN 后组合特征中仍存在非有限值,评估可能失败")
     except Exception as fill_e:
         logger.error(f"EVAL: 填充 NaN 或转换类型时失败: {fill_e}")
         return -np.inf, 0.0
@@ -190,7 +190,7 @@ def evaluate_feature_importance(
         X_val_comb = X_combined.loc[X_val_base.index]
         logger.trace(f"EVAL: 内部验证集拆分完成: Train={len(X_tr_base)}, Val={len(X_val_base)}")
     except Exception as e:
-         logger.error(f"EVAL: 评估特征 '{feature_name}' 时，拆分验证集失败: {e}")
+         logger.error(f"EVAL: 评估特征 '{feature_name}' 时,拆分验证集失败: {e}")
          return -np.inf, 0.0
 
     # --- 评估基线模型  ---
@@ -234,7 +234,7 @@ def evaluate_feature_importance(
                 elif feature_name in importances.index: # 尝试名称
                      feature_importance_val = float(importances[feature_name])
                 else:
-                     logger.warning(f"EVAL: 无法在模型重要性中找到特征 '{clean_feature_name}' 或 '{feature_name}'，重要性设为 0")
+                     logger.warning(f"EVAL: 无法在模型重要性中找到特征 '{clean_feature_name}' 或 '{feature_name}',重要性设为 0")
                      feature_importance_val = 0.0
             except Exception as imp_e:
                  logger.warning(f"EVAL: 获取特征 '{clean_feature_name}'/'{feature_name}' 重要性失败: {imp_e}")
@@ -251,7 +251,7 @@ def evaluate_feature_importance(
     # --- 计算性能提升  ---
     if not np.isfinite(baseline_score) or not np.isfinite(new_score):
         performance_gain = -np.inf
-        logger.warning(f"EVAL: 无法计算特征 '{feature_name}' 的性能提升，因为得分无效 (baseline={baseline_score}, new={new_score})")
+        logger.warning(f"EVAL: 无法计算特征 '{feature_name}' 的性能提升,因为得分无效 (baseline={baseline_score}, new={new_score})")
     elif higher_is_better:
         performance_gain = new_score - baseline_score
     else: # Lower is better

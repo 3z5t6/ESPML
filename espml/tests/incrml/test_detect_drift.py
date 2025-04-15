@@ -16,7 +16,7 @@ try:
     DRIFT_MODULE_LOADED = True
 except ImportError as e:
     DRIFT_MODULE_LOADED = False
-    pytest.skip(f"跳过 detect_drift 测试，因为导入失败: {e}", allow_module_level=True)
+    pytest.skip(f"跳过 detect_drift 测试,因为导入失败: {e}", allow_module_level=True)
 
 pytestmark = pytest.mark.skipif(not DRIFT_MODULE_LOADED, reason="espml.incrml.detect_drift 或其依赖项无法导入")
 
@@ -81,13 +81,13 @@ def test_ddm_min_update_logic(ddm_detector: DriftDetectorDDM):
     # 填充到 min_instance_num
     for _ in range(ddm_detector.min_instance_num): ddm_detector.add_element(True)
     p_min1, s_min1 = ddm_detector.p_min, ddm_detector.s_min
-    # 再添加一个正确，p+s 应该下降
+    # 再添加一个正确,p+s 应该下降
     ddm_detector.add_element(True)
     assert ddm_detector.p + ddm_detector.s < p_min1 + s_min1
     assert np.isclose(ddm_detector.p_min, ddm_detector.p)
     assert np.isclose(ddm_detector.s_min, ddm_detector.s)
     p_min2, s_min2 = ddm_detector.p_min, ddm_detector.s_min
-    # 添加一个错误，p+s 可能上升
+    # 添加一个错误,p+s 可能上升
     ddm_detector.add_element(False)
     assert np.isclose(ddm_detector.p_min, p_min2) # min 不应改变
     assert np.isclose(ddm_detector.s_min, s_min2)

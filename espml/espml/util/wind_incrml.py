@@ -3,7 +3,7 @@
 # pylint: disable=too-many-branches, too-many-statements, broad-except, protected-access
 """
 风电增量学习任务驱动模块 (espml)
-负责根据任务配置，驱动数据处理、训练（完全或增量）、预测、回测流程，并记录详细日志
+负责根据任务配置,驱动数据处理、训练（完全或增量）、预测、回测流程,并记录详细日志
 """
 
 import datetime
@@ -19,7 +19,7 @@ import traceback
 from espml.incrml.metadata import ModelVersionInfo # 用于打印完整错误堆栈
 
 # 导入 espml 内部模块
-# 使用 try-except 包装，以便模块可以单独测试或处理导入问题
+# 使用 try-except 包装,以便模块可以单独测试或处理导入问题
 try:
     from espml.ml import MLPipeline
 except ImportError:
@@ -41,7 +41,7 @@ try:
     from espml.util import result_saver
 except ImportError:
     logger.error("无法导入 espml.util 中的模块 (utils, const, result_saver)")
-    # 定义占位符，可能导致后续错误
+    # 定义占位符,可能导致后续错误
     common_utils = None; const = None; result_saver = None # type: ignore
 
 # 导入 croniter
@@ -49,7 +49,7 @@ try:
     from croniter import croniter
     CRONITER_INSTALLED = True
 except ImportError:
-    logger.warning("库 'croniter' 未安装，基于 Cron 的任务触发器将不可用")
+    logger.warning("库 'croniter' 未安装,基于 Cron 的任务触发器将不可用")
     croniter = None # type: ignore
     CRONITER_INSTALLED = False
 
@@ -59,7 +59,7 @@ try:
     DEFAULT_TIMEZONE = pytz.timezone(common_utils.safe_dict_get(config, 'Project.Timezone', 'Asia/Shanghai')) # 从配置读取时区
     PYTZ_INSTALLED = True
 except Exception: # 捕获导入和配置读取错误
-    logger.warning("库 'pytz' 未安装或配置中缺少 Timezone，将使用系统默认本地时区")
+    logger.warning("库 'pytz' 未安装或配置中缺少 Timezone,将使用系统默认本地时区")
     DEFAULT_TIMEZONE = None
     PYTZ_INSTALLED = False
 
@@ -68,7 +68,7 @@ class WindTaskRunner:
     """
     单个风电预测/回测任务的驱动器
     """
-    # 类属性存储数据缓存，用于数据可用性检查 (避免重复加载)
+    # 类属性存储数据缓存,用于数据可用性检查 (避免重复加载)
     _raw_data_cache: Dict[str, Optional[pd.DataFrame]] = {'fans': None, 'tower': None, 'weather': None}
     _raw_data_load_time: Optional[datetime.datetime] = None
     _raw_data_cache_ttl_seconds: int = 600 # 数据缓存有效期 (例如 10 分钟)
@@ -130,18 +130,18 @@ class WindTaskRunner:
         self.effective_config = common_utils.merge_dictionaries(self.effective_config, self.task_config_override, deep=True)
 
         # --- 初始化核心组件 ---
-        # 在 run 方法中按需初始化可能更灵活，但代码（假设在 init 中）
+        # 在 run 方法中按需初始化可能更灵活,但代码（假设在 init 中）
         self.ml_pipeline: Optional[MLPipeline] = None
         self.incrml_manager: Optional[IncrmlManager] = None
         try:
             # 需要确保依赖都已导入
             if IncrmlManager is not Any:
                 self.incrml_manager = IncrmlManager(task_id=self.task_id, config=self.effective_config, logger_instance=self.logger)
-            else: self.logger.error("IncrmlManager 未正确导入，增量学习功能不可用")
+            else: self.logger.error("IncrmlManager 未正确导入,增量学习功能不可用")
 
             if MLPipeline is not Any:
                 self.ml_pipeline = MLPipeline(config=self.effective_config)
-            else: self.logger.error("MLPipeline 未正确导入，核心流程不可用")
+            else: self.logger.error("MLPipeline 未正确导入,核心流程不可用")
 
         except Exception as init_e:
             self.logger.exception(f"初始化核心组件失败: {init_e}")
@@ -172,7 +172,7 @@ class WindTaskRunner:
 
     def _get_task_config(self, task_id_to_find: str) -> Optional[Dict[str, Any]]:
         """(内部) 从完整配置中查找特定 task_id 的配置"""
-        # 假设 tasks 列表在顶层 'tasks' 键下，或者需要从 task_config.yaml 加载
+        # 假设 tasks 列表在顶层 'tasks' 键下,或者需要从 task_config.yaml 加载
         # 此处假设在 self.config['tasks']
         all_tasks_config = self.config.get('tasks')
         if not isinstance(all_tasks_config, list): return None
@@ -196,7 +196,7 @@ class WindTaskRunner:
             # 转换为当前时区
             prev_run = DEFAULT_TIMEZONE.localize(prev_run_naive) if DEFAULT_TIMEZONE else prev_run_naive
             # logger.trace(f"Cron Check: Now={now}, PrevPlanned={prev_run}, LastRun={last_successful_run_time}")
-            # 如果当前时间在上一个计划点之后，并且（如果存在上次运行时间）上次运行时间在上一个计划点之前
+            # 如果当前时间在上一个计划点之后,并且（如果存在上次运行时间）上次运行时间在上一个计划点之前
             if now >= prev_run and (last_successful_run_time is None or last_successful_run_time < prev_run):
                  self.logger.debug(f"Cron trigger '{cron_expression}' is due.")
                  return True
@@ -211,7 +211,7 @@ class WindTaskRunner:
         # 检查缓存是否需要更新
         if self._raw_data_load_time is None or \
            (now - self._raw_data_load_time).total_seconds() > self._raw_data_cache_ttl_seconds:
-            self.logger.info("数据缓存已过期或不存在，重新加载...")
+            self.logger.info("数据缓存已过期或不存在,重新加载...")
             self._raw_data_cache = {'fans': None, 'tower': None, 'weather': None} # 清空缓存
             ds_config = self.effective_config['DataSource']
             raw_resource_dir = const.PROJECT_ROOT / ds_config['dir']
@@ -225,8 +225,8 @@ class WindTaskRunner:
                  if path.exists():
                       try:
                            time_col = ds_config[f"{name.capitalize()}TimeCol"] if name != 'weather' else ds_config['WeatherForecastTimeCol']
-                           # 优化只读取时间列检查范围？不，检查需要值
-                           # 读取完整文件（或优化为只读部分日期？）
+                           # 优化只读取时间列检查范围?不,检查需要值
+                           # 读取完整文件（或优化为只读部分日期?）
                            df_raw = pd.read_csv(path, parse_dates=[time_col], infer_datetime_format=True)
                            df_raw = df_raw.set_index(time_col).sort_index()
                            self._raw_data_cache[name] = df_raw
@@ -247,14 +247,14 @@ class WindTaskRunner:
     # 数据可用性检查逻辑和日志
     def _check_data_readiness(self, start_dt: pd.Timestamp, end_dt: pd.Timestamp) -> bool:
         """(内部) 检查所需时间范围内的数据是否完整可用"""
-        self.logger.info(f"开始检查数据可用性，范围: [{start_dt}, {end_dt}]...")
+        self.logger.info(f"开始检查数据可用性,范围: [{start_dt}, {end_dt}]...")
         required_freq_str = self.effective_config['Feature']['TimeFrequency']
         is_ready = True
 
         try:
             # 1. 加载或更新数据缓存
             if not self._load_raw_data_for_check(start_dt, end_dt):
-                 self.logger.error("无法加载必要的数据（特别是 fans.csv），数据检查失败")
+                 self.logger.error("无法加载必要的数据（特别是 fans.csv）,数据检查失败")
                  return False
 
             # 2. 生成预期的时间点索引
@@ -277,7 +277,7 @@ class WindTaskRunner:
             while current_check_dt <= end_dt:
                  # --- 打印日志 ---
                  log_start_str = current_check_dt.strftime(const.DATETIME_FORMAT)
-                 # 假设日志范围是固定的 4 小时，与实际检查逻辑可能无关
+                 # 假设日志范围是固定的 4 小时,与实际检查逻辑可能无关
                  log_end_dt = current_check_dt + datetime.timedelta(hours=4)
                  log_end_str = log_end_dt.strftime(const.DATETIME_FORMAT)
                  data_freq_minutes = int(self.data_freq.total_seconds() / 60)
@@ -296,17 +296,17 @@ class WindTaskRunner:
                       if not cols_to_check: continue # 无需检查的列
 
                       if current_check_dt not in df_raw.index:
-                           self.logger.error(f"数据检查失败时间点 {current_check_dt} 在 {source_name} 数据中缺失索引！")
+                           self.logger.error(f"数据检查失败时间点 {current_check_dt} 在 {source_name} 数据中缺失索引!")
                            is_ready = False; break
                       # 检查关键列是否有 NaN
-                      # 使用 .loc 获取行，然后检查 NaN
+                      # 使用 .loc 获取行,然后检查 NaN
                       row_data = df_raw.loc[[current_check_dt]] # 获取单行 DataFrame
                       if row_data[cols_to_check].isna().any().any():
                             missing_info_cols = row_data[cols_to_check].isna().any()[lambda x: x].index.tolist()
-                            self.logger.error(f"数据检查失败时间点 {current_check_dt} 在 {source_name} 数据源的关键列 {missing_info_cols} 存在 NaN！")
+                            self.logger.error(f"数据检查失败时间点 {current_check_dt} 在 {source_name} 数据源的关键列 {missing_info_cols} 存在 NaN!")
                             is_ready = False; break
 
-                 if not is_ready: break # 发现问题，停止检查
+                 if not is_ready: break # 发现问题,停止检查
 
                  current_check_dt += check_interval # 移动到下一个时间点
 
@@ -315,7 +315,7 @@ class WindTaskRunner:
             is_ready = False
 
         if is_ready: self.logger.info("数据可用性检查通过")
-        else: self.logger.error("数据可用性检查未通过！")
+        else: self.logger.error("数据可用性检查未通过!")
         return is_ready
 
     # 使用计时器装饰 run 方法
@@ -325,7 +325,7 @@ class WindTaskRunner:
         执行单个任务的完整流程
         """
         if not self.enabled:
-            self.logger.info(f"任务 '{self.task_id}' 未启用，跳过执行")
+            self.logger.info(f"任务 '{self.task_id}' 未启用,跳过执行")
             return
 
         self.logger.info(f"=============== 开始执行任务: {self.task_id} ({self.description}) ===============")
@@ -345,13 +345,13 @@ class WindTaskRunner:
         run_incremental = False
         if self._is_trigger_time(self.train_trigger_cron, last_run_time):
              should_train_update = True; run_incremental = False
-             self.logger.info("定时训练触发器满足，计划执行完全重新训练")
+             self.logger.info("定时训练触发器满足,计划执行完全重新训练")
         elif self.incrml_manager and self.incrml_manager.enabled:
              latest_data_ts = current_time - self.data_fetch_lag # 估算最新数据时间
              if self.incrml_manager.trigger != 'OnDriftDetected': # 漂移检测不在此处主动触发
                   if self.incrml_manager.check_trigger(latest_data_timestamp=latest_data_ts):
                        should_train_update = True; run_incremental = True
-                       self.logger.info("增量学习触发器满足，计划执行增量更新")
+                       self.logger.info("增量学习触发器满足,计划执行增量更新")
 
         # --- 执行训练或增量更新 ---
         training_status_ok = True # 标记本轮训练/更新是否成功
@@ -367,13 +367,13 @@ class WindTaskRunner:
 
             # 检查数据可用性
             if not self._check_data_readiness(train_start_dt, train_end_dt):
-                 self.logger.error("训练所需数据不完整，取消本次训练/更新！")
+                 self.logger.error("训练所需数据不完整,取消本次训练/更新!")
                  training_status_ok = False # 标记失败
             else:
                  self.logger.info("Getting the training data...")
                  # 确保 MLPipeline 和 IncrML Manager 实例存在
                  if self.ml_pipeline is None or self.incrml_manager is None:
-                      self.logger.error("MLPipeline 或 IncrmlManager 未初始化！")
+                      self.logger.error("MLPipeline 或 IncrmlManager 未初始化!")
                       training_status_ok = False
                  else:
                       if run_incremental: # --- 执行增量更新 ---
@@ -388,7 +388,7 @@ class WindTaskRunner:
 
                                 incrml_train_data = self.incrml_manager.prepare_data(available_df=available_df)
                                 if incrml_train_data.empty:
-                                     self.logger.warning("增量数据准备后为空，跳过更新")
+                                     self.logger.warning("增量数据准备后为空,跳过更新")
                                      training_status_ok = False # 算作未成功更新
                                 else:
                                      update_successful = self.incrml_manager.update(
@@ -403,15 +403,15 @@ class WindTaskRunner:
                                          self.logger.info(f"the {log_ts.strftime(const.DATETIME_FORMAT)} training task training successful.")
                                      else:
                                          training_status_ok = False # 标记失败
-                                         self.logger.error("增量更新执行失败！")
-                           except Exception as inc_e: self.logger.exception("执行增量更新时出错！"); training_status_ok = False
+                                         self.logger.error("增量更新执行失败!")
+                           except Exception as inc_e: self.logger.exception("执行增量更新时出错!"); training_status_ok = False
                       else: # --- 执行完全重新训练 ---
                            self.logger.info("执行完全重新训练流程...")
                            try:
                                data_processor_full = DataProcessor(config=self.effective_config)
                                df_full_train = data_processor_full.process(start_time=train_start_dt, end_time=train_end_dt)
                                if df_full_train.empty:
-                                    self.logger.error("加载的完全训练数据为空！")
+                                    self.logger.error("加载的完全训练数据为空!")
                                     training_status_ok = False
                                else:
                                     run_id_full = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%d%H%M%S%f') + "_full"
@@ -421,7 +421,7 @@ class WindTaskRunner:
                                     if train_successful:
                                          current_run_id = run_id_full # 更新 run_id
                                          # 全量训练后也需要更新元数据
-                                         self.logger.info("全量训练完成，正在更新 IncrML 元数据...")
+                                         self.logger.info("全量训练完成,正在更新 IncrML 元数据...")
                                          model_path, tf_path, feat_path, _ = self.ml_pipeline._get_run_specific_paths(run_id_full)
                                          performance = {}
                                          if hasattr(self.ml_pipeline, 'automl_wrapper') and self.ml_pipeline.automl_wrapper and \
@@ -435,7 +435,7 @@ class WindTaskRunner:
                                               training_data_start=train_start_dt.isoformat(), training_data_end=train_end_dt.isoformat(),
                                               performance_metrics=performance, base_model_version=None # 全量训练无基线
                                          )
-                                         # 更新采样器状态（用全量数据？）
+                                         # 更新采样器状态（用全量数据?）
                                          if self.incrml_manager.sampler:
                                              sampler_state_upd = self.incrml_manager.sampler.update_state(df_full_train, df_full_train, new_version_info_full.to_dict())
                                              if sampler_state_upd: new_version_info_full.misc_info.update(sampler_state_upd)
@@ -445,8 +445,8 @@ class WindTaskRunner:
                                          self.logger.info(f"the {train_end_dt.strftime(const.DATETIME_FORMAT)} training task training successful.")
                                     else:
                                          training_status_ok = False
-                                         self.logger.error("完全重新训练失败！")
-                           except Exception as full_e: self.logger.exception("执行完全重新训练时出错！"); training_status_ok = False
+                                         self.logger.error("完全重新训练失败!")
+                           except Exception as full_e: self.logger.exception("执行完全重新训练时出错!"); training_status_ok = False
 
             # 严格匹配训练结束日志
             if training_status_ok and current_run_id: # 确保有成功的 run_id
@@ -469,19 +469,19 @@ class WindTaskRunner:
             self.logger.info(f"计算预测输入数据窗口: [{predict_start_dt}, {predict_end_dt}]")
 
             if not self._check_data_readiness(predict_start_dt, predict_end_dt):
-                 self.logger.error("预测所需输入数据不完整，取消本次预测！")
+                 self.logger.error("预测所需输入数据不完整,取消本次预测!")
             else:
                  if self.ml_pipeline is None: self.ml_pipeline = MLPipeline(config=self.effective_config) # 确保实例存在
                  try:
                       # 加载预测输入数据 (需要 DP 处理)
                       data_processor_pred = DataProcessor(config=self.effective_config)
-                      # 注意预测时 end_time 应该是 predict_ref_time，但加载需要 predict_end_dt
+                      # 注意预测时 end_time 应该是 predict_ref_time,但加载需要 predict_end_dt
                       X_pred_input = data_processor_pred.process(start_time=predict_start_dt, end_time=predict_end_dt)
                       if X_pred_input.empty: raise ValueError("处理后的预测输入数据为空")
                       if self.target_name in X_pred_input.columns:
                           X_pred_input = X_pred_input.drop(columns=[self.target_name])
 
-                      # 获取当前模型 ID (应该使用最新的，可能是刚训练的，也可能是之前的)
+                      # 获取当前模型 ID (应该使用最新的,可能是刚训练的,也可能是之前的)
                       current_model_meta = self.incrml_manager.metadata.get_current_version()
                       if not current_model_meta or not current_model_meta.version_id:
                           raise RuntimeError("无法获取当前有效的模型版本 ID 进行预测")
@@ -507,10 +507,10 @@ class WindTaskRunner:
                            common_len = min(len(predictions_array), len(pred_index))
                            predictions_adjusted[:common_len] = predictions_array[:common_len]
                            if len(predictions_array) != len(pred_index):
-                                logger.warning(f"预测结果长度({len(predictions_array)})与预期({len(pred_index)})不符，已调整")
+                                logger.warning(f"预测结果长度({len(predictions_array)})与预期({len(pred_index)})不符,已调整")
 
                            predictions_df = pd.DataFrame({const.PREDICTION_COLUMN_NAME: predictions_adjusted}, index=pred_index)
-                           # 可以加入其他列，例如预测输入特征？取决于代码
+                           # 可以加入其他列,例如预测输入特征?取决于代码
 
                            # 保存结果
                            save_ok = result_saver.save_prediction_result(
@@ -519,14 +519,14 @@ class WindTaskRunner:
                            )
                            if save_ok:
                                # 严格匹配日志
-                               # 日志中的时间戳是哪个？假设是预测参考时间
+                               # 日志中的时间戳是哪个?假设是预测参考时间
                                self.logger.info(f"the {predict_ref_time.strftime(const.DATETIME_FORMAT)} training task predict successful.")
-                           else: self.logger.error("保存预测结果失败！")
-                      else: self.logger.error("MLPipeline.predict 返回 None，预测失败")
+                           else: self.logger.error("保存预测结果失败!")
+                      else: self.logger.error("MLPipeline.predict 返回 None,预测失败")
 
                  except Exception as pred_e: self.logger.exception(f"执行预测时出错: {pred_e}")
 
-        else: self.logger.debug("预测触发器未满足条件，跳过预测")
+        else: self.logger.debug("预测触发器未满足条件,跳过预测")
 
 
         # --- 回测逻辑 (如果 task_type == 'backtrack') ---
@@ -572,7 +572,7 @@ class WindTaskRunner:
                       self.logger.info(f"计算回测训练数据窗口: [{train_start_dt}, {train_end_dt}]")
 
                       if not self._check_data_readiness(train_start_dt, train_end_dt):
-                           self.logger.error(f"回测 ({current_simulated_time}): 训练数据不完整，跳过此时间点！")
+                           self.logger.error(f"回测 ({current_simulated_time}): 训练数据不完整,跳过此时间点!")
                            backtrack_train_status_ok = False
                       else:
                            self.logger.info(f"回测 ({current_simulated_time}): 开始训练...")
@@ -597,16 +597,16 @@ class WindTaskRunner:
                                )
                                if not train_successful:
                                     backtrack_train_status_ok = False
-                                    self.logger.error(f"回测 ({current_simulated_time}): 训练失败！")
+                                    self.logger.error(f"回测 ({current_simulated_time}): 训练失败!")
                                else: # 严格匹配日志
                                     self.logger.info(f"the {train_end_dt.strftime(const.DATETIME_FORMAT)} training task training successful.") # 日志时间戳用训练结束时间
                            except Exception as bt_train_e:
                                 self.logger.exception(f"回测 ({current_simulated_time}): 训练过程中出错: {bt_train_e}")
                                 backtrack_train_status_ok = False
-                 else: # 不重新训练，需要加载对应日期的模型
+                 else: # 不重新训练,需要加载对应日期的模型
                       # 需要逻辑来确定加载哪个 run_id (可能基于 backtrack_model_path_pattern)
                       # run_id_backtrack = # ... 确定要加载的模型 ID ...
-                      self.logger.info(f"回测 ({current_simulated_time}): 跳过重新训练，将加载预训练模型 (ID: {run_id_backtrack})")
+                      self.logger.info(f"回测 ({current_simulated_time}): 跳过重新训练,将加载预训练模型 (ID: {run_id_backtrack})")
                       # 需要检查模型是否存在
                       # ...
 
@@ -619,7 +619,7 @@ class WindTaskRunner:
                      self.logger.info(f"计算回测预测输入数据窗口: [{predict_start_dt}, {predict_end_dt}]")
 
                      if not self._check_data_readiness(predict_start_dt, predict_end_dt):
-                          self.logger.error(f"回测 ({current_simulated_time}): 预测所需输入数据不完整，跳过预测！")
+                          self.logger.error(f"回测 ({current_simulated_time}): 预测所需输入数据不完整,跳过预测!")
                      else:
                           try:
                               # 实例化 Pipeline (或使用已有的)
@@ -655,13 +655,13 @@ class WindTaskRunner:
                                    )
                                    if save_ok: # 严格匹配日志
                                         self.logger.info(f"the {current_simulated_time.strftime(const.DATETIME_FORMAT)} training task predict successful.")
-                                   else: self.logger.error(f"回测 ({current_simulated_time}): 保存预测结果失败！")
+                                   else: self.logger.error(f"回测 ({current_simulated_time}): 保存预测结果失败!")
                               else: self.logger.error(f"回测 ({current_simulated_time}): 预测失败 (predict 返回 None)")
 
                           except Exception as bt_pred_e:
                                self.logger.exception(f"回测 ({current_simulated_time}): 预测过程中出错: {bt_pred_e}")
                  else:
-                      self.logger.warning(f"回测 ({current_simulated_time}): 训练失败或无法确定模型 ID，跳过预测")
+                      self.logger.warning(f"回测 ({current_simulated_time}): 训练失败或无法确定模型 ID,跳过预测")
 
         except Exception as bt_e:
              self.logger.exception(f"执行回测流程时发生严重错误: {bt_e}")

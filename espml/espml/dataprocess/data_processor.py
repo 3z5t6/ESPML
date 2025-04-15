@@ -22,9 +22,9 @@ class DataProcessingError(Exception):
 
 class DataProcessor:
     """
-    封装完整的数据处理流程，严格遵循项目逻辑
+    封装完整的数据处理流程,严格遵循项目逻辑
 
-    从配置文件读取参数，执行加载、合并、清洗、特征工程等步骤
+    从配置文件读取参数,执行加载、合并、清洗、特征工程等步骤
     包含对风速高度调整、高级数据过滤（卡死、标准差、结冰）、
     以及精细化特征工程（滞后、滚动、交互、风向向量）的支持
     """
@@ -50,7 +50,7 @@ class DataProcessor:
         logger.info("DataProcessor 初始化完成")
 
     def _validate_and_extract_config(self) -> None:
-        """(私有) 校验配置的完整性，并提取常用配置项到实例属性以便访问"""
+        """(私有) 校验配置的完整性,并提取常用配置项到实例属性以便访问"""
         logger.debug("开始校验和提取数据处理配置...")
         extracted_config = {}
         try:
@@ -137,7 +137,7 @@ class DataProcessor:
         logger.debug("数据处理配置校验和提取完成")
 
     # --- _load_csv_robust ---
-    # (保持之前的实现，确保它使用 self.resource_dir, self.internal_time_index, self.time_format 等实例属性)
+    # (保持之前的实现,确保它使用 self.resource_dir, self.internal_time_index, self.time_format 等实例属性)
     @utils.log_execution_time(level="DEBUG")
     def _load_csv_robust(self, file_name: str, time_col: str, use_cols: Optional[List[str]] = None, rename_map: Optional[Dict[str, str]] = None, is_forecast_time: bool = False) -> pd.DataFrame:
         cache_key = file_name
@@ -151,7 +151,7 @@ class DataProcessor:
         utils.check_path_exists(file_path, path_type='f', raise_error=True)
 
         try:
-            # 可以在此处添加基于 utils.get_file_size 的预检查，如果文件过大则警告或分块读取
+            # 可以在此处添加基于 utils.get_file_size 的预检查,如果文件过大则警告或分块读取
             # ...
             df = pd.read_csv(file_path, usecols=use_cols, encoding=const.DEFAULT_ENCODING)
             logger.debug(f"成功读取文件: {file_path}, 形状: {df.shape}")
@@ -161,7 +161,7 @@ class DataProcessor:
 
             # 使用 utils.parse_datetime_flexible 增加解析鲁棒性
             # df[self.internal_time_index] = utils.parse_datetime_flexible(df[time_col], fmts=self.time_format) # 这不适用于 Series
-            # 保持之前的 pandas 解析逻辑，但错误处理更清晰
+            # 保持之前的 pandas 解析逻辑,但错误处理更清晰
             try:
                 df[self.internal_time_index] = pd.to_datetime(df[time_col], format=self.time_format, errors='coerce')
             except ValueError: # If format string is invalid or doesn't match at all
@@ -175,7 +175,7 @@ class DataProcessor:
             df.dropna(subset=[self.internal_time_index], inplace=True)
             removed_count = original_count - len(df)
             if removed_count > 0:
-                logger.warning(f"因时间列 '{time_col}' 解析失败或为空，移除了 {removed_count} 行")
+                logger.warning(f"因时间列 '{time_col}' 解析失败或为空,移除了 {removed_count} 行")
 
             if df.empty:
                 raise DataProcessingError(f"处理时间列后 DataFrame 为空: {file_name}")
@@ -183,7 +183,7 @@ class DataProcessor:
             if not is_forecast_time:
                 if df[self.internal_time_index].duplicated().any():
                     dup_count = df[self.internal_time_index].duplicated().sum()
-                    logger.warning(f"文件 {file_name} 中发现 {dup_count} 个重复的时间戳，将保留第一个")
+                    logger.warning(f"文件 {file_name} 中发现 {dup_count} 个重复的时间戳,将保留第一个")
                     df = df[~df[self.internal_time_index].duplicated(keep='first')]
 
             df.set_index(self.internal_time_index, inplace=True)
@@ -196,7 +196,7 @@ class DataProcessor:
                 valid_rename_map = {k: v for k, v in rename_map.items() if k in df.columns}
                 missing_orig_cols = set(rename_map.keys()) - set(df.columns)
                 if missing_orig_cols:
-                    logger.warning(f"在文件 {file_name} 中，配置的重命名列不存在: {missing_orig_cols}")
+                    logger.warning(f"在文件 {file_name} 中,配置的重命名列不存在: {missing_orig_cols}")
                 df.rename(columns=valid_rename_map, inplace=True)
                 # logger.debug(f"列已重命名: {valid_rename_map}")
                 required_cols_after_rename = list(rename_map.values())
@@ -209,7 +209,7 @@ class DataProcessor:
                  self._raw_data_cache[cache_key] = df.copy()
             return df
 
-        except FileNotFoundError: raise # 已检查，但以防万一
+        except FileNotFoundError: raise # 已检查,但以防万一
         except DataProcessingError: raise
         except Exception as e:
             logger.error(f"加载或处理文件 {file_path} 时发生未预料的错误: {e}", exc_info=True)
@@ -217,7 +217,7 @@ class DataProcessor:
 
 
     # --- _load_and_prepare_all_data ---
-    # (保持之前的实现，确保它使用 self.fans_time_col 等实例属性)
+    # (保持之前的实现,确保它使用 self.fans_time_col 等实例属性)
     @utils.log_execution_time(level="DEBUG")
     def _load_and_prepare_all_data(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         logger.info("开始加载所有数据...")
@@ -239,7 +239,7 @@ class DataProcessor:
             tower_cols_to_load = [self.tower_time_col] + list(self.tower_rename_map.keys())
             df_tower = self._load_csv_robust(const.TOWER_CSV, self.tower_time_col, tower_cols_to_load, self.tower_rename_map)
         except FileNotFoundError:
-            logger.warning(f"{const.TOWER_CSV} 文件未找到，将不使用测风塔数据")
+            logger.warning(f"{const.TOWER_CSV} 文件未找到,将不使用测风塔数据")
         except DataProcessingError as e:
             logger.error(f"加载或处理测风塔数据失败: {e}将不使用测风塔数据")
 
@@ -252,7 +252,7 @@ class DataProcessor:
             # Process duplicates based on issue time
             issue_time_col_in_df = self.weather_issue_time_col # Assuming it exists after loading
             if issue_time_col_in_df in df_weather_raw.columns:
-                logger.info(f"根据发布时间 '{issue_time_col_in_df}' 处理重复预报，保留最新记录")
+                logger.info(f"根据发布时间 '{issue_time_col_in_df}' 处理重复预报,保留最新记录")
                 try:
                     # Use flexible parsing for issue time as well
                     issue_time_dt = pd.to_datetime(df_weather_raw[issue_time_col_in_df], errors='coerce')
@@ -266,13 +266,13 @@ class DataProcessor:
                 df_weather_raw = df_weather_raw.sort_values(by=[df_weather_raw.index.name, 'issue_time_dt'], ascending=[True, False])
                 df_weather = df_weather_raw[~df_weather_raw.index.duplicated(keep='first')]
                 df_weather = df_weather.drop(columns=[issue_time_col_in_df, 'issue_time_dt'], errors='ignore')
-                # logger.debug(f"天气预报去重完成，保留 {len(df_weather)} 条记录")
+                # logger.debug(f"天气预报去重完成,保留 {len(df_weather)} 条记录")
             else:
-                logger.warning(f"天气预报数据中未找到发布时间列 '{issue_time_col_in_df}'，无法按最新发布去重")
+                logger.warning(f"天气预报数据中未找到发布时间列 '{issue_time_col_in_df}',无法按最新发布去重")
                 df_weather = df_weather_raw[~df_weather_raw.index.duplicated(keep='first')]
             df_weather.sort_index(inplace=True)
         except FileNotFoundError:
-            logger.warning(f"{const.WEATHER_CSV} 文件未找到，将不使用天气预报数据")
+            logger.warning(f"{const.WEATHER_CSV} 文件未找到,将不使用天气预报数据")
         except DataProcessingError as e:
             logger.error(f"加载或处理天气预报数据失败: {e}将不使用天气预报数据")
 
@@ -296,7 +296,7 @@ class DataProcessor:
              raise DataProcessingError(f"'{df_name}' 重采样失败: {e}") from e
 
     # --- _merge_data_sources ---
-    # (保持之前的实现，包含高度调整逻辑)
+    # (保持之前的实现,包含高度调整逻辑)
     @utils.log_execution_time(level="DEBUG")
     def _merge_data_sources(self, df_fans: pd.DataFrame, df_tower: pd.DataFrame, df_weather: pd.DataFrame) -> pd.DataFrame:
         logger.info("开始合并已重采样的数据源 (含高度调整)...")
@@ -306,7 +306,7 @@ class DataProcessor:
         df_weather_resampled = self._resample_and_align(df_weather, "Weather")
 
         if df_fans_resampled.empty:
-             raise DataProcessingError("风机数据为空，无法合并")
+             raise DataProcessingError("风机数据为空,无法合并")
 
         # --- 高度调整 ---
         if self.reference_height is not None:
@@ -339,7 +339,7 @@ class DataProcessor:
                          logger.error(f"调整天气预报风速时出错: {e}", exc_info=True)
                          df_weather_resampled[const.INTERNAL_WEATHER_WS_COL] = np.nan
                 # else: logger.debug(f"天气预报风速高度 ({self.weather_ws_height}m) 与参考高度相同")
-        # else: logger.debug("未配置参考高度，跳过风速高度调整")
+        # else: logger.debug("未配置参考高度,跳过风速高度调整")
 
         # --- 合并 ---
         df_merged = df_fans_resampled
@@ -352,13 +352,13 @@ class DataProcessor:
         total_cells = df_merged.size
         nan_cells = df_merged.isna().sum().sum()
         nan_ratio = nan_cells / total_cells if total_cells > 0 else 0
-        logger.info(f"数据源合并完成，形状: {df_merged.shape}，NaN 比例: {nan_ratio:.2%}")
+        logger.info(f"数据源合并完成,形状: {df_merged.shape},NaN 比例: {nan_ratio:.2%}")
         return df_merged
 
     # --- _clean_merged_data (深度修订) ---
     @utils.log_execution_time(level="DEBUG")
     def _clean_merged_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        """(深度修订) 清洗合并后的数据，严格按顺序执行配置的清洗步骤"""
+        """(深度修订) 清洗合并后的数据,严格按顺序执行配置的清洗步骤"""
         logger.info("开始数据清洗流程 (含高级过滤)...")
         df_cleaned = df.copy()
         numeric_cols = df_cleaned.select_dtypes(include=np.number).columns.tolist()
@@ -412,7 +412,7 @@ class DataProcessor:
                 method=self.interpolate_method, limit_direction='both', limit=self.interpolate_limit
             )
             interpolated_count = nan_before_interp - df_cleaned[numeric_cols].isna().sum().sum()
-            logger.info(f"非目标数值列插值完成，填充了 {interpolated_count} 个 NaN")
+            logger.info(f"非目标数值列插值完成,填充了 {interpolated_count} 个 NaN")
         except Exception as e:
             logger.error(f"非目标数值列插值失败: {e}")
 
@@ -422,7 +422,7 @@ class DataProcessor:
             ws_col_pc = const.INTERNAL_TOWER_WS_COL if const.INTERNAL_TOWER_WS_COL in df_cleaned.columns else const.INTERNAL_WEATHER_WS_COL
             if ws_col_pc in df_cleaned.columns and self.outlier_method_power == "PowerCurve":
                 params = self.power_curve_params
-                # 先插值目标列，避免因 NaN 导致功率曲线判断失效
+                # 先插值目标列,避免因 NaN 导致功率曲线判断失效
                 nan_target_before_pc = df_cleaned[target_col].isna().sum()
                 if nan_target_before_pc > 0:
                      logger.debug("功率曲线过滤前插值目标列...")
@@ -442,7 +442,7 @@ class DataProcessor:
                  logger.info(f"应用基于范围 [0, {upper_limit:.2f}] 的功率过滤...")
                  df_cleaned[target_col] = df_cleaned[target_col].clip(0, upper_limit)
             else: logger.warning(f"未知的功率异常值处理方法: {self.outlier_method_power}")
-        else: logger.warning(f"目标列 '{target_col}' 不在数据中，无法处理功率异常值")
+        else: logger.warning(f"目标列 '{target_col}' 不在数据中,无法处理功率异常值")
 
         # --- 步骤 6: 再次插值目标列 (处理功率曲线过滤可能产生的 NaN) ---
         logger.debug("步骤 6/8: 再次插值目标列...")
@@ -450,7 +450,7 @@ class DataProcessor:
              nan_target_after_pc = df_cleaned[target_col].isna().sum()
              if nan_target_after_pc > 0:
                   df_cleaned[target_col] = df_cleaned[target_col].interpolate(method=self.interpolate_method, limit_direction='both', limit=self.interpolate_limit)
-                  logger.debug(f"再次插值目标列，填充了 {nan_target_after_pc - df_cleaned[target_col].isna().sum()} 个 NaN")
+                  logger.debug(f"再次插值目标列,填充了 {nan_target_after_pc - df_cleaned[target_col].isna().sum()} 个 NaN")
 
         # --- 步骤 7: 处理风速范围异常值 ---
         logger.info("步骤 7/8: 处理风速范围异常值...")
@@ -463,7 +463,7 @@ class DataProcessor:
                  if col in df_cleaned.columns: df_cleaned[col] = df_cleaned[col].clip(min_ws, max_ws)
         else: logger.debug(f"未配置或不支持的风速范围过滤方法: {self.outlier_method_ws}")
 
-        # --- 步骤 8: 检测结冰条件 (如果启用，添加为特征) ---
+        # --- 步骤 8: 检测结冰条件 (如果启用,添加为特征) ---
         if self.enable_icing_detection:
              logger.info("步骤 8/8: 检测结冰条件...")
              temp_col = const.INTERNAL_TOWER_TEMP_COL if const.INTERNAL_TOWER_TEMP_COL in df_cleaned.columns else const.INTERNAL_WEATHER_TEMP_COL
@@ -481,18 +481,18 @@ class DataProcessor:
                          **self.icing_params # 使用配置中的参数
                      )
                      df_cleaned['icing_condition_flag'] = icing_mask.astype(int)
-                     logger.info("结冰条件检测完成，已添加 'icing_condition_flag' 特征")
+                     logger.info("结冰条件检测完成,已添加 'icing_condition_flag' 特征")
                  except Exception as e: logger.error(f"检测结冰条件时失败: {e}")
-             else: logger.warning("无法检测结冰条件，缺少温度列")
+             else: logger.warning("无法检测结冰条件,缺少温度列")
         else: logger.debug("步骤 8/8: 跳过结冰条件检测 (未启用)")
 
         # --- 最终 NaN 填充 ---
-        # 清洗步骤完成后，理论上只有插值无法覆盖的开头/结尾可能有 NaN
+        # 清洗步骤完成后,理论上只有插值无法覆盖的开头/结尾可能有 NaN
         logger.info(f"开始最终 NaN 填充 (策略: {self.final_nan_fill_strategy})...")
         nan_counts = df_cleaned.isna().sum()
         nan_cols = nan_counts[nan_counts > 0]
         if not nan_cols.empty:
-             logger.warning(f"清洗后，在最终填充前，以下列仍包含 NaN:\n{nan_cols}")
+             logger.warning(f"清洗后,在最终填充前,以下列仍包含 NaN:\n{nan_cols}")
              if self.final_nan_fill_strategy == 'ffill_bfill_zero':
                  df_cleaned.fillna(method='ffill', inplace=True)
                  df_cleaned.fillna(method='bfill', inplace=True)
@@ -501,8 +501,8 @@ class DataProcessor:
              elif self.final_nan_fill_strategy == 'zero':
                  df_cleaned.fillna(0, inplace=True)
                  logger.info("使用 0 策略填充了剩余 NaN")
-             else: # 默认或未知策略，用 0 填充并警告
-                 logger.warning(f"未知的最终 NaN 填充策略 '{self.final_nan_fill_strategy}'，将使用 0 填充")
+             else: # 默认或未知策略,用 0 填充并警告
+                 logger.warning(f"未知的最终 NaN 填充策略 '{self.final_nan_fill_strategy}',将使用 0 填充")
                  df_cleaned.fillna(0, inplace=True)
         else:
             logger.info("数据清洗后未发现需要最终填充的 NaN 值")
@@ -513,7 +513,7 @@ class DataProcessor:
     # --- _engineer_features (深度修订) ---
     @utils.log_execution_time(level="DEBUG")
     def _engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """(深度修订) 执行特征工程，严格按照配置并调用相关工具函数"""
+        """(深度修订) 执行特征工程,严格按照配置并调用相关工具函数"""
         logger.info("开始执行特征工程...")
         df_featured = df.copy()
         idx = df_featured.index
@@ -539,7 +539,7 @@ class DataProcessor:
                     if isinstance(lag, int) and lag > 0:
                         lag_col_name = f"{col}_lag{lag}"
                         df_featured[lag_col_name] = df_featured[col].shift(lag)
-        else: logger.debug("未配置或配置无效，跳过滞后特征创建")
+        else: logger.debug("未配置或配置无效,跳过滞后特征创建")
 
         # 3. 滚动窗口特征 (根据 self.rolling_config)
         logger.info(f"创建滚动窗口特征 (Config: {len(self.rolling_config)} 个列)...")
@@ -617,7 +617,7 @@ class DataProcessor:
         nan_counts_before_final = df_featured.isna().sum()
         nan_cols_before_final = nan_counts_before_final[nan_counts_before_final > 0]
         if not nan_cols_before_final.empty:
-            logger.warning(f"特征工程后，在最终填充前，以下列包含 NaN:\n{nan_cols_before_final}")
+            logger.warning(f"特征工程后,在最终填充前,以下列包含 NaN:\n{nan_cols_before_final}")
             if self.final_nan_fill_strategy == 'ffill_bfill_zero':
                 df_featured.fillna(method='ffill', inplace=True)
                 df_featured.fillna(method='bfill', inplace=True)
@@ -625,7 +625,7 @@ class DataProcessor:
             elif self.final_nan_fill_strategy == 'zero':
                 df_featured.fillna(0, inplace=True)
             else: # 默认或未知策略
-                logger.warning(f"未知的最终 NaN 填充策略 '{self.final_nan_fill_strategy}'，将使用 0 填充")
+                logger.warning(f"未知的最终 NaN 填充策略 '{self.final_nan_fill_strategy}',将使用 0 填充")
                 df_featured.fillna(0, inplace=True)
             logger.info(f"特征工程 NaN 填充完成")
         else:
@@ -635,12 +635,12 @@ class DataProcessor:
         if utils.safe_dict_get(self.config, 'Resource.DowncastDataTypes', False):
              df_featured = utils.downcast_dataframe_dtypes(df_featured, verbose=True)
 
-        logger.info(f"特征工程完成，最终 DataFrame 形状: {df_featured.shape}")
+        logger.info(f"特征工程完成,最终 DataFrame 形状: {df_featured.shape}")
         return df_featured
 
 
     # --- process 方法 ---
-    # (保持不变，调用重写后的内部方法)
+    # (保持不变,调用重写后的内部方法)
     @utils.log_execution_time(level="INFO") # 对整个流程计时
     def process(self, start_time: Optional[Union[str, pd.Timestamp]] = None, end_time: Optional[Union[str, pd.Timestamp]] = None) -> pd.DataFrame:
         """
@@ -666,14 +666,14 @@ class DataProcessor:
             if end_time:
                 df_processed = df_processed[df_processed.index <= pd.to_datetime(end_time)]
             if len(df_processed) < initial_rows:
-                 logger.info(f"时间筛选后，数据从 {initial_rows} 行减少到 {len(df_processed)} 行")
+                 logger.info(f"时间筛选后,数据从 {initial_rows} 行减少到 {len(df_processed)} 行")
 
             # 最终校验
             if df_processed.empty: raise DataProcessingError("处理结果为空 DataFrame")
             if self.internal_target_col not in df_processed.columns: raise DataProcessingError(f"目标列 '{self.internal_target_col}' 处理后丢失")
             if df_processed.index.name != self.internal_time_index: df_processed.index.name = self.internal_time_index
             if df_processed.isna().any().any():
-                 final_nan_counts = df_processed.isna().sum(); logger.error(f"严重警告最终结果包含 NaN！\n{final_nan_counts[final_nan_counts > 0]}")
+                 final_nan_counts = df_processed.isna().sum(); logger.error(f"严重警告最终结果包含 NaN!\n{final_nan_counts[final_nan_counts > 0]}")
                  # 生产环境可能需要报错: raise DataProcessingError("最终处理结果包含 NaN 值")
 
             final_start = df_processed.index.min(); final_end = df_processed.index.max()

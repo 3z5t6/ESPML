@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 预测结果保存模块 (espml)
-负责将预测和回测结果保存为 CSV 文件，并记录运行元数据
+负责将预测和回测结果保存为 CSV 文件,并记录运行元数据
 """
 
 import os
@@ -41,14 +41,14 @@ def _prepare_save_path(
         Path: 完整的保存文件路径
 
     Raises:
-        ValueError: 如果回测模式缺少 pred_ref_time，或 task_id 无效
+        ValueError: 如果回测模式缺少 pred_ref_time,或 task_id 无效
         OSError: 如果无法创建输出目录
     """
     if not task_id or not isinstance(task_id, str):
         raise ValueError("无效的任务 ID (task_id)")
 
     output_path = Path(output_dir)
-    # 使用 common_utils 创建目录，并在失败时抛出异常
+    # 使用 common_utils 创建目录,并在失败时抛出异常
     if not common_utils.mkdir_if_not_exist(output_path):
          error_msg = f"无法创建结果保存目录: {output_path}"
          logger.critical(error_msg) # 使用 critical 级别
@@ -89,7 +89,7 @@ def _validate_prediction_df(df: pd.DataFrame) -> bool:
          if np.isinf(df[PREDICTION_COLUMN_NAME].dropna()).any():
               inf_count = np.isinf(df[PREDICTION_COLUMN_NAME]).sum()
               logger.warning(f"预测列 '{PREDICTION_COLUMN_NAME}' 包含 {inf_count} 个 Inf 值")
-              # 代码可能在此处处理 Inf，时仅警告
+              # 代码可能在此处处理 Inf,时仅警告
     return True
 
 # 使用计时器装饰（如果代码有）
@@ -105,7 +105,7 @@ def save_prediction_result(
     ) -> bool:
     """
     保存预测或回测结果到 CSV 文件
-    代码逻辑，包括文件名生成和 CSV 参数
+    代码逻辑,包括文件名生成和 CSV 参数
 
     Args:
         predictions_df (pd.DataFrame): 预测结果 DataFrame
@@ -124,7 +124,7 @@ def save_prediction_result(
 
     # 验证输入 DataFrame
     if not _validate_prediction_df(predictions_df):
-        logger.error("输入 DataFrame 验证失败，取消保存")
+        logger.error("输入 DataFrame 验证失败,取消保存")
         return False
 
     # 准备保存路径 (捕获可能的错误)
@@ -199,13 +199,13 @@ def append_run_metadata(
     try:
         # 将字典转换为单行 DataFrame
         meta_df = pd.DataFrame([metadata_dict])
-        # 确保列顺序一致性（可选，但推荐）
+        # 确保列顺序一致性（可选,但推荐）
         # if file_exists:
         #     try:
         #          existing_header = pd.read_csv(meta_path, nrows=0).columns.tolist()
         #          meta_df = meta_df.reindex(columns=existing_header) # 按现有文件头排序
         #     except Exception as read_e:
-        #          logger.warning(f"读取现有 meta.csv 头失败: {read_e}，将按字典顺序写入")
+        #          logger.warning(f"读取现有 meta.csv 头失败: {read_e},将按字典顺序写入")
 
         # logger.trace(f"追加的元数据: {metadata_dict}")
         # logger.trace(f"文件是否存在: {file_exists}, 是否写入 header: {not file_exists}")

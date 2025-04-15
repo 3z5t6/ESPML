@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 应用程序状态管理模块 (espml)
-使用 JSON 文件持久化简单的键值对状态信息，包含文件锁确保并发安全
+使用 JSON 文件持久化简单的键值对状态信息,包含文件锁确保并发安全
 """
 
 import json
@@ -17,7 +17,7 @@ try:
     import fcntl
     FCNTL_AVAILABLE = True
 except ImportError:
-    logger.warning("模块 'fcntl' 不可用 (可能在非 Unix 系统上)，文件锁功能将无法使用并发写入状态文件可能导致问题")
+    logger.warning("模块 'fcntl' 不可用 (可能在非 Unix 系统上),文件锁功能将无法使用并发写入状态文件可能导致问题")
     fcntl = None # type: ignore
     FCNTL_AVAILABLE = False
 
@@ -40,9 +40,9 @@ class FileLock:
     """简单的文件锁上下文管理器 """
     def __init__(self, lock_file_path: Path, timeout: float = LOCK_TIMEOUT):
         if not FCNTL_AVAILABLE:
-            # 如果 fcntl 不可用，文件锁无法工作
+            # 如果 fcntl 不可用,文件锁无法工作
             self.logger = logger.bind(name="FileLock_Disabled")
-            self.logger.warning("fcntl 不可用，文件锁已被禁用")
+            self.logger.warning("fcntl 不可用,文件锁已被禁用")
             self.lock_file_path = None # 标记为不可用
             self._lock_file_handle = None
             return
@@ -53,7 +53,7 @@ class FileLock:
         self._lock_file_handle: Optional[int] = None # 文件描述符是整数
 
     def __enter__(self) -> 'FileLock':
-        if not self.lock_file_path: return self # 如果锁不可用，直接返回
+        if not self.lock_file_path: return self # 如果锁不可用,直接返回
 
         start_time = time.monotonic()
         while True:
@@ -103,7 +103,7 @@ class FileLock:
                 self.lock_file_path.unlink(missing_ok=True)
             except OSError: pass # 忽略删除错误
         except Exception as e:
-             # 即使释放失败，也要记录错误
+             # 即使释放失败,也要记录错误
              self.logger.error(f"释放文件锁或删除锁文件时出错: {e}")
         finally:
             self._lock_file_handle = None # 确保句柄被清理
@@ -183,7 +183,7 @@ def get_state_value(key: str, default: Any = None, file_path: Union[str, Path] =
 def set_state_value(key: str, value: Any, file_path: Union[str, Path] = DEFAULT_STATE_FILE) -> bool:
     """设置指定键的状态值并保存"""
     # logger.trace(f"设置状态值: Key='{key}', Value='{value}', Path='{file_path}'")
-    # 直接调用 load 和 save，锁在内部处理
+    # 直接调用 load 和 save,锁在内部处理
     current_state = load_state(file_path)
     current_state[key] = value
     return save_state(current_state, file_path)

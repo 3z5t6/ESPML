@@ -26,7 +26,7 @@ try:
         from croniter import croniter
         CRONITER_INSTALLED = True
     except ImportError:
-        print("警告: 'croniter' 未安装，无法验证 Cron 表达式")
+        print("警告: 'croniter' 未安装,无法验证 Cron 表达式")
         croniter = None # type: ignore
         CRONITER_INSTALLED = False
 except ImportError:
@@ -116,7 +116,7 @@ def generate_crontab_lines(
         if task_type == 'forecast':
             if triggers['train']:
                 cron_expr = triggers['train']
-                # 假设 main.py 通过 task_id 自行判断是训练还是预测，或者需要 --mode 参数
+                # 假设 main.py 通过 task_id 自行判断是训练还是预测,或者需要 --mode 参数
                 command = base_command.format(script_path=main_script_path) # + " --mode train"
                 if croniter and not croniter.is_valid(cron_expr): print(f"警告: 任务 '{task_id}' 训练 Cron 无效: '{cron_expr}'")
                 crontab_lines.append(f"{cron_expr} {command} # ESPML Train: {task_id}")
@@ -129,11 +129,11 @@ def generate_crontab_lines(
         elif task_type == 'backtrack':
             if triggers['backtrack']:
                 cron_expr = triggers['backtrack']
-                # 回测脚本需要指定日期范围，这通常不由 cron 提供
+                # 回测脚本需要指定日期范围,这通常不由 cron 提供
                 # 生成的命令只负责按时启动回测脚本
-                # 需要确保回测脚本能处理日期（例如默认跑昨天，或从状态文件读取）
+                # 需要确保回测脚本能处理日期（例如默认跑昨天,或从状态文件读取）
                 command = base_command.format(script_path=backtrack_script_path) # 回测脚本也需要 task_id
-                # 移除 --task_id? 取决于回测脚本逻辑，假设它需要知道是哪个任务的回测配置
+                # 移除 --task_id? 取决于回测脚本逻辑,假设它需要知道是哪个任务的回测配置
                 # command = f"{python_executable} {backtrack_script_path} --config {config_path_arg} --task_config {str(Path(task_config_path).resolve())} --task_id {task_id}"
 
                 if croniter and not croniter.is_valid(cron_expr): print(f"警告: 任务 '{task_id}' 回测 Cron 无效: '{cron_expr}'")

@@ -14,14 +14,14 @@ from loguru import logger
 
 # 导入本项目定义的工具和常量
 from espml.util import utils as common_utils
-from espml.autofe import utils as autofe_utils # 可能需要导入常量，但函数本身不应依赖其他 autofe 模块
+from espml.autofe import utils as autofe_utils # 可能需要导入常量,但函数本身不应依赖其他 autofe 模块
 
 logger = logger.bind(name="autofe.operators") # 创建子 logger
 
 # --- 内部辅助函数 (如果代码有) ---
-# 例如，安全除法或类型检查，如果它们没有放在通用 utils 中
+# 例如,安全除法或类型检查,如果它们没有放在通用 utils 中
 def _safe_divide_local(numerator: pd.Series, denominator: pd.Series, default: float = np.nan) -> pd.Series:
-    """本地安全除法，防止 utils 模块循环依赖（如果 utils 导入了 operators）"""
+    """本地安全除法,防止 utils 模块循环依赖（如果 utils 导入了 operators）"""
     with np.errstate(divide='ignore', invalid='ignore'):
         result = numerator.astype(float) / denominator.astype(float)
     result[~np.isfinite(result)] = default
@@ -38,7 +38,7 @@ def _get_numeric_series(features: Union[pd.Series, pd.DataFrame], index: int = 0
         s = features
     else:
         raise TypeError("输入必须是 Series 或 DataFrame")
-    return pd.to_numeric(s, errors='coerce') # 转换为数值，无效值为 NaN
+    return pd.to_numeric(s, errors='coerce') # 转换为数值,无效值为 NaN
 
 
 # --- 单特征操作符 ('n',) ---
@@ -47,7 +47,7 @@ def sine(features: Union[pd.Series, pd.DataFrame]) -> pd.Series:
     """计算特征的正弦值"""
     s = _get_numeric_series(features, 0)
     # logger.trace("Calculating sine...")
-    # 代码可能在操作前填充 NaN，此处假设保留 NaN
+    # 代码可能在操作前填充 NaN,此处假设保留 NaN
     return np.sin(s) # NaN 输入 -> NaN 输出
 
 def cosine(features: Union[pd.Series, pd.DataFrame]) -> pd.Series:
@@ -57,12 +57,12 @@ def cosine(features: Union[pd.Series, pd.DataFrame]) -> pd.Series:
     return np.cos(s)
 
 def pow(features: Union[pd.Series, pd.DataFrame], exponent: float = 2.0) -> pd.Series:
-    """计算特征的幂次方（默认为平方），并裁剪"""
+    """计算特征的幂次方（默认为平方）,并裁剪"""
     # 注意 Transform 类中的 eval 调用可能不直接支持传递 exponent 参数
     # 代码可能只实现了 pow2 或 pow3
-    # 此处假设 exponent 是固定的或通过其他方式处理，暂时只实现平方
-    # 如果需要支持参数，Transform 类中的 eval 调用需要修改
-    logger.warning("Operator 'pow' 实现假定指数为 2.0，请检查代码逻辑")
+    # 此处假设 exponent 是固定的或通过其他方式处理,暂时只实现平方
+    # 如果需要支持参数,Transform 类中的 eval 调用需要修改
+    logger.warning("Operator 'pow' 实现假定指数为 2.0,请检查代码逻辑")
     s = _get_numeric_series(features, 0)
     # logger.trace("Calculating pow (exponent=2.0)...")
     powered_feature = s.pow(2.0)
@@ -71,7 +71,7 @@ def pow(features: Union[pd.Series, pd.DataFrame], exponent: float = 2.0) -> pd.S
     return powered_feature.clip(lower=clip_lower, upper=clip_upper).fillna(0) # 填充 NaN
 
 def log(features: Union[pd.Series, pd.DataFrame]) -> pd.Series:
-    """计算特征的自然对数（log1p(|x|)），并裁剪"""
+    """计算特征的自然对数（log1p(|x|)）,并裁剪"""
     s = _get_numeric_series(features, 0)
     # logger.trace("Calculating log...")
     #  log(1 + |x|) 逻辑
@@ -198,9 +198,9 @@ def combine(features: pd.DataFrame, intermediate: bool = False) -> Union[pd.Seri
 # --- 数值按分类聚合操作符 ('n', 'c') ---
 
 def _agg_op(op_name: str, features: pd.DataFrame, intermediate: bool = False) -> Union[pd.Series, Tuple[pd.Series, pd.Series]]:
-    """(内部) 聚合操作辅助函数， transform 逻辑"""
+    """(内部) 聚合操作辅助函数, transform 逻辑"""
     if not isinstance(features, pd.DataFrame) or features.shape[1] < 2:
-        raise ValueError(f"聚合操作 '{op_name}' 需要至少包含两列（分组列，数值列）的 DataFrame")
+        raise ValueError(f"聚合操作 '{op_name}' 需要至少包含两列（分组列,数值列）的 DataFrame")
     if features.empty: return pd.Series(dtype=float) if not intermediate else (pd.Series(dtype=float), pd.Series(dtype=float))
 
     group_col, value_col = features.columns[0], features.columns[1]
@@ -212,7 +212,7 @@ def _agg_op(op_name: str, features: pd.DataFrame, intermediate: bool = False) ->
     try:
         # 确保值列是数值类型
         value_series = pd.to_numeric(features[value_col], errors='coerce')
-        # 准备分组键，处理 NaN
+        # 准备分组键,处理 NaN
         group_series = features[group_col].fillna('__NaN__') # 将 NaN 视为一个类别
 
         # 步骤 1: 计算中间统计量 (按组聚合)
@@ -272,14 +272,14 @@ def aggstd(features: pd.DataFrame, intermediate: bool = False) -> Union[pd.Serie
 # --- 数值特征之间的基本运算 ('n', 'n') ---
 
 def _arithmetic_op(op: str, features: pd.DataFrame) -> pd.Series:
-    """(内部) 算术运算辅助函数，"""
+    """(内部) 算术运算辅助函数,"""
     if not isinstance(features, pd.DataFrame) or features.shape[1] < 2:
         raise ValueError(f"算术操作 '{op}' 需要至少包含两列的 DataFrame")
     if features.empty: return pd.Series(dtype=float)
 
     col1, col2 = features.columns[0], features.columns[1]
     # logger.trace(f"Performing arithmetic op '{op}' on '{col1}' and '{col2}'")
-    # 先转 float，再操作
+    # 先转 float,再操作
     feat1 = features[col1].astype(float)
     feat2 = features[col2].astype(float)
 
@@ -315,7 +315,7 @@ def std(features: pd.DataFrame) -> pd.Series: # 注意此 std 与 ('n','c') 的 
     if features.empty: return pd.Series(dtype=float)
     # logger.trace(f"Calculating row-wise std for columns: {features.columns[:2].tolist()}")
     try:
-        # 只取前两列，确保是数值
+        # 只取前两列,确保是数值
         feat1 = pd.to_numeric(features.iloc[:, 0], errors='coerce')
         feat2 = pd.to_numeric(features.iloc[:, 1], errors='coerce')
         temp_df = pd.concat([feat1, feat2], axis=1)
@@ -334,7 +334,7 @@ def maximize(features: pd.DataFrame) -> pd.Series:
     try:
         feat1 = pd.to_numeric(features.iloc[:, 0], errors='coerce')
         feat2 = pd.to_numeric(features.iloc[:, 1], errors='coerce')
-        # numpy.maximum 会传播 NaN，我们需要填充
+        # numpy.maximum 会传播 NaN,我们需要填充
         return np.maximum(feat1, feat2).fillna(0) # 假设填充 0
     except Exception as e:
         logger.exception(f"计算行最大值 (maximize) 时出错: {e}")
@@ -344,7 +344,7 @@ def maximize(features: pd.DataFrame) -> pd.Series:
 # --- 时间序列操作符 ('n', 't') ---
 
 def _ts_op(op_type: str, features: Union[pd.Series, pd.DataFrame], time: int, **kwargs) -> Union[pd.Series, pd.DataFrame]:
-    """(内部) 时间序列操作辅助函数，"""
+    """(内部) 时间序列操作辅助函数,"""
     # 检查 time 参数
     if not isinstance(time, int) or time == 0:
          logger.error(f"时间序列操作 '{op_type}' 的时间跨度 'time' ({time}) 必须是非零整数")
@@ -366,15 +366,15 @@ def _ts_op(op_type: str, features: Union[pd.Series, pd.DataFrame], time: int, **
             feature_series = features.iloc[:, 0]
             target_col_name = features.columns[0]
         elif features.shape[1] >= 2 and op_type not in ['ts_cov', 'ts_corr', 'ewm_cov', 'ewm_corr']:
-            # 假设对于非 cov/corr 的分组操作，第一列是分组键，第二列是值列
+            # 假设对于非 cov/corr 的分组操作,第一列是分组键,第二列是值列
             group_col = features.columns[0]
             value_col = features.columns[1]
             feature_series = features # 在 groupby 内部处理
             target_col_name = value_col # 结果是值列的变换
             logger.trace(f"执行分组时间序列操作 '{op_type}', Group: '{group_col}', Value: '{value_col}'")
         elif features.shape[1] >= 2 and op_type in ['ts_cov', 'ts_corr', 'ewm_cov', 'ewm_corr']:
-             # 对于协方差/相关性，需要两列数值
-             # TODO: 代码如何处理这两列？是 DataFrame 的前两列吗？
+             # 对于协方差/相关性,需要两列数值
+             # TODO: 代码如何处理这两列?是 DataFrame 的前两列吗?
              # 假设是前两列
              col1, col2 = features.columns[0], features.columns[1]
              logger.trace(f"执行滚动/EWM Cov/Corr 操作 '{op_type}' on '{col1}', '{col2}'")
@@ -423,10 +423,10 @@ def _ts_op(op_type: str, features: Union[pd.Series, pd.DataFrame], time: int, **
              if op_type == 'diff': result = feature_series.diff(periods=time)
              elif op_type == 'delay': result = feature_series.shift(periods=time)
              elif op_type.startswith('ts_'):
-                 # 处理 cov/corr，它们需要两个 Series
+                 # 处理 cov/corr,它们需要两个 Series
                  if op_type in ['ts_cov', 'ts_corr']:
                       if not isinstance(feature_series, pd.DataFrame) or feature_series.shape[1] < 2:
-                           logger.warning(f"操作 '{op_type}' 需要两列输入，但只收到一列或非 DataFrame返回 NaN")
+                           logger.warning(f"操作 '{op_type}' 需要两列输入,但只收到一列或非 DataFrame返回 NaN")
                            result = pd.Series(np.nan, index=features.index)
                       else:
                            rolling_obj = feature_series.iloc[:, 0].rolling(window=window, min_periods=min_periods)
@@ -465,7 +465,7 @@ def _ts_op(op_type: str, features: Union[pd.Series, pd.DataFrame], time: int, **
                       else: raise ValueError(f"未知的 EWM 操作: {op_func_name}")
              else: raise ValueError(f"未知的时间序列操作类型: {op_type}")
 
-        # 最终处理填充 NaN 为 0，恢复名称（如果输入是 Series）
+        # 最终处理填充 NaN 为 0,恢复名称（如果输入是 Series）
         if isinstance(result, pd.Series):
              result = result.fillna(0)
              if target_col_name: result = result.rename(target_col_name)
@@ -503,7 +503,7 @@ def ts_std(features: Union[pd.Series, pd.DataFrame], time: int) -> pd.Series:
 
 def ts_cov(features: pd.DataFrame, time: int) -> pd.Series: # 返回 Series (两列计算结果)
     """计算时间序列的滚动协方差（需要 DataFrame 输入）"""
-    # 注意返回类型改为 Series，因为 cov 通常计算两列之间的关系
+    # 注意返回类型改为 Series,因为 cov 通常计算两列之间的关系
     return _ts_op('ts_cov', features, time) # type: ignore
 
 def ts_corr(features: pd.DataFrame, time: int) -> pd.Series: # 返回 Series
