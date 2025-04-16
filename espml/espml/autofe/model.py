@@ -21,7 +21,7 @@ from espml.autofe import utils as autofe_utils
 DEFAULT_EVAL_MODEL_PARAMS_REGRESSION: Dict[str, Any] = {
     'n_estimators': 40,
     'max_depth': 10,
-    'max_features': 1.0, # 假设代码包含此参数
+    'max_features': 1.0,
     'min_samples_leaf': 5,
     'n_jobs': -1,
     'random_state': None, # 由函数参数传入覆盖
@@ -40,7 +40,7 @@ DEFAULT_EVAL_MODEL_PARAMS_CLASSIFICATION: Dict[str, Any] = {
 }
 
 # --- 内部评估函数 ---
-def _calculate_metric(metric_name: str, y_true: pd.Series, y_pred: np.ndarray) -> float:
+def _calculate_metric(metric_name: str, y_true: pd.Series, y_pred: np.ndarray, logger: Any = logger) -> float:
     """(内部函数) 根据配置的 metric 计算得分"""
     if metric_name == 'rmse':
         # 确保预测值也是数值类型且有限

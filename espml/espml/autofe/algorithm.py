@@ -224,7 +224,7 @@ def threads_feature_select(
     X_candidates = df_with_candidates.select_dtypes(include=np.number) # 只对数值特征计算
     if X_candidates.empty:
          logger.warning("计算出的候选特征均非数值类型,无法计算 Gini")
-         # 即使没有数值特征,也要返回空的 scores dict（如果 return_socre=True）
+         # 即使没有数值特征,也要返回空的 scores dict（如果 return_score=True）
          return selected_features, selected_features_df, features_scores
 
     logger.debug(f"步骤 2/3: 为 {len(X_candidates.columns)} 个数值候选特征计算 Gini 分数...")
@@ -254,8 +254,8 @@ def threads_feature_select(
     end_time = time.perf_counter()
     logger.info(f"并行特征筛选 ('threads_feature_select') 完成,耗时: {end_time - start_time:.2f} 秒")
 
-    # 根据 return_socre 返回结果
-    if return_socre:
+    # 根据 return_score 返回结果
+    if return_score:
         return selected_features, selected_features_df, features_scores
     else:
         # 如果代码不返回分数,则返回空字典
@@ -298,10 +298,13 @@ def model_features_select(
             - 筛选后保留的特征名称列表 (包含特征和被选中的高级特征)
             - 使用筛选后特征在验证集上达到的最终分数
     """
+    # 引用参数避免"未存取"警告
+    _ = time_index
+
     if not LGBM_INSTALLED: # 检查 LGBM 是否导入成功
         logger.error("LightGBM 未安装,无法执行 model_features_select")
         # 失败时返回空特征列表和最差分数
-        worst_score = -np.inf if metric in {'roc_auc', 'f1', 'accuracy'} else np.inf
+        worst_score = -np.inf if metric in {'roc_auc', 'f1', 'accuracy', 'auc_mu', 'r2', 'ap'} else np.inf
         return [], worst_score
 
     try:
@@ -315,26 +318,51 @@ def model_features_select(
         raise ValueError("输入 'fes' 必须是包含 (X_train, X_val, y_train, y_val) 且非空的元组")
 
     logger.info("开始执行基于模型的特征选择 (LightGBM)...")
-    # logger.debug(f"Input shapes: X_train={X_train_lgb.shape}, X_val={X_val_lgb.shape}")
-    # logger.debug(f"Task: {task_type}, Metric: {metric}, Baseline: {baseline}")
+    logger.debug(f"Input shapes: X_train={X_train_lgb.shape}, X_val={X_val_lgb.shape}")
+    logger.debug(f"Task: {task_type}, Metric: {metric}, Baseline: {baseline}")
 
+    # 支持的评估指标
+    supported_metrics = {
+        'regression': ['rmse', 'mae', 'mse', 'msle', 'r2'],
+        'classification': ['auc', 'roc_auc', 'neg_log_loss', 'accuracy', 'f1', 'auc_mu', 'ap']
+    }
+    
+    current_mode = 'regression' if task_type == 'regression' else 'classification'
+    if metric not in supported_metrics.get(current_mode, []):
+        logger.warning(f"评估指标 '{metric}' 不在推荐的 {current_mode} 指标列表中，可能不受完全支持")
+    
     higher_is_better = metric in {'roc_auc', 'f1', 'accuracy', 'auc_mu', 'r2', 'ap'}
 
     # --- 模型参数准备 ---
     lgbm_params = { # 默认参数
         'objective': 'regression_l1' if task_type == 'regression' else 'binary',
         'metric': 'mae' if task_type == 'regression' else 'auc',
-        'n_estimators': 200, 'learning_rate': 0.05, 'feature_fraction': 0.8,
-        'bagging_fraction': 0.8, 'bagging_freq': 1, 'lambda_l1': 0.1,
-        'lambda_l2': 0.1, 'num_leaves': 31, 'verbose': -1, 'n_jobs': -1,
-        'seed': seed, 'boosting_type': 'gbdt',
+        'n_estimators': 200, 
+        'learning_rate': 0.05, 
+        'feature_fraction': 0.8,
+        'bagging_fraction': 0.8, 
+        'bagging_freq': 1, 
+        'lambda_l1': 0.1,
+        'lambda_l2': 0.1, 
+        'num_leaves': 31, 
+        'verbose': -1, 
+        'n_jobs': -1,
+        'seed': seed, 
+        'boosting_type': 'gbdt',
     }
+    
+    # 任务特定优化
     if task_type != 'regression':
          lgbm_params['is_unbalance'] = True
-         if metric == 'neg_log_loss': lgbm_params['metric'] = 'binary_logloss'
-         elif metric == 'f1': lgbm_params['metric'] = 'f1' # 可能需要指定 average
-         elif metric == 'accuracy': lgbm_params['metric'] = 'accuracy'
-         else: lgbm_params['metric'] = 'auc' # 默认 AUC
+         # 映射评估指标
+         metric_mapping = {
+             'neg_log_loss': 'binary_logloss',
+             'f1': 'f1',
+             'accuracy': 'accuracy',
+             'auc': 'auc',
+             'roc_auc': 'auc'
+         }
+         lgbm_params['metric'] = metric_mapping.get(metric, 'auc')
 
     if model_params: # 用户覆盖
         logger.debug(f"使用用户提供的 LGBM 参数覆盖默认值: {model_params}")
@@ -343,19 +371,46 @@ def model_features_select(
     # --- 数据准备 (分类特征) ---
     categorical_cols = [col for col in cat_features if col in X_train_lgb.columns]
     logger.debug(f"模型选择中使用的分类特征: {categorical_cols}")
+    
+    # 检查并处理分类特征
+    valid_categorical_cols = []
     for col in categorical_cols:
         try: # 尝试统一类型为 category
+            # 检查特征是否有足够的值
+            if X_train_lgb[col].nunique() <= 1:
+                logger.warning(f"分类特征 '{col}' 只有一个唯一值，不作为分类特征处理")
+                continue
+                
             train_cat = X_train_lgb[col].astype('category')
             val_cat = X_val_lgb[col].astype('category')
             common_cats = pd.api.types.union_categoricals([train_cat, val_cat], sort_categories=True).categories
             X_train_lgb[col] = pd.Categorical(train_cat, categories=common_cats)
             X_val_lgb[col] = pd.Categorical(val_cat, categories=common_cats)
+            valid_categorical_cols.append(col)
         except Exception as cat_e:
              logger.warning(f"处理分类特征 '{col}' 时出错,将尝试让 LGBM 自动处理: {cat_e}")
-             # 不从 categorical_cols 移除,让 LGBM 尝试自动处理 object 类型
+             # 添加到valid_categorical_cols，让LGBM尝试处理
+             valid_categorical_cols.append(col)
+
+    # 移除具有过多缺失值的特征
+    missing_thresh = 0.9  # 允许的最大缺失比例
+    valid_features = []
+    for col in X_train_lgb.columns:
+        missing_ratio = X_train_lgb[col].isna().mean()
+        if missing_ratio < missing_thresh:
+            valid_features.append(col)
+        else:
+            logger.warning(f"特征 '{col}' 缺失值比例 {missing_ratio:.2%} 超过阈值 {missing_thresh:.2%}，被移除")
+    
+    if len(valid_features) < len(X_train_lgb.columns):
+        X_train_lgb = X_train_lgb[valid_features]
+        X_val_lgb = X_val_lgb[valid_features]
+        # 更新分类特征列表
+        valid_categorical_cols = [col for col in valid_categorical_cols if col in valid_features]
+        logger.info(f"移除高缺失特征后，保留 {len(valid_features)}/{len(X_train.columns)} 个特征")
 
     # --- 训练与筛选 ---
-    selected_features: List[str] = list(X_train.columns) # 默认返回所有
+    selected_features: List[str] = list(X_train_lgb.columns) # 默认返回所有
     final_score: float = baseline # 默认返回基线
     model = None
 
@@ -364,40 +419,54 @@ def model_features_select(
         model_cls = lgb.LGBMRegressor if task_type == 'regression' else lgb.LGBMClassifier
         model = model_cls(**lgbm_params)
 
+        # 预处理数据 - 填充缺失值
+        X_train_lgb = X_train_lgb.fillna(X_train_lgb.median())
+        X_val_lgb = X_val_lgb.fillna(X_train_lgb.median())  # 用训练集的中位数填充验证集
+
         # 准备 fit 参数
         fit_params = {
-            "X": X_train_lgb, "y": y_train_lgb,
+            "X": X_train_lgb, 
+            "y": y_train_lgb,
             "eval_set": [(X_val_lgb, y_val_lgb)],
             # 适配 eval_metric (LGBM 可能不支持所有 sklearn metric name)
             "eval_metric": 'logloss' if metric == 'neg_log_loss' else ('l1' if metric == 'mae' else metric),
             "callbacks": [lgb.early_stopping(100, verbose=False), lgb.log_evaluation(period=0)], # 假设使用早停
             # 显式传递 categorical_feature
-            "categorical_feature": categorical_cols if categorical_cols else 'auto'
+            "categorical_feature": valid_categorical_cols if valid_categorical_cols else 'auto'
         }
+        
         model.fit(**fit_params)
         logger.debug("初始 LGBM 模型训练完成")
 
         # 获取重要性并筛选
         if hasattr(model, 'feature_importances_'):
             importances = pd.Series(model.feature_importances_, index=X_train_lgb.columns)
-            # logger.trace(f"特征重要性: \n{importances.sort_values(ascending=False)}")
+            logger.trace(f"特征重要性: \n{importances.sort_values(ascending=False)}")
+            
+            # 动态调整重要性阈值
+            if importances.max() < 10 * importance_threshold:
+                # 如果所有重要性都较低，降低阈值
+                adj_threshold = importances.max() / 10
+                logger.info(f"特征重要性普遍较低，调整阈值从 {importance_threshold} 到 {adj_threshold}")
+                importance_threshold = adj_threshold
+                
             selected_features = importances[importances > importance_threshold].index.tolist()
             logger.info(f"根据重要性 (> {importance_threshold}) 筛选出 {len(selected_features)} 个特征")
 
             if not selected_features:
                  logger.warning("基于重要性的模型筛选未选中任何特征!将保留所有特征")
-                 selected_features = list(X_train.columns)
+                 selected_features = list(X_train_lgb.columns)
                  # 重新计算分数（使用所有特征）
                  if metric == 'neg_log_loss': preds = model.predict_proba(X_val_lgb)
                  else: preds = model.predict(X_val_lgb)
-                 final_score = _calculate_metric(metric, y_val_lgb, preds) # 使用内部函数
+                 final_score = _calculate_metric(metric, y_val_lgb, preds, logger) # 使用内部函数
             else:
                 # 使用选中特征重新评估分数
                 logger.debug(f"使用 {len(selected_features)} 个选定特征重新评估...")
                 # 确保只使用选中的列,并处理分类特征
                 X_train_selected = X_train_lgb[selected_features]
                 X_val_selected = X_val_lgb[selected_features]
-                categorical_selected = [c for c in categorical_cols if c in selected_features]
+                categorical_selected = [c for c in valid_categorical_cols if c in selected_features]
 
                 # 可以在此重新训练,但更常见的是直接用 model.best_score_ (如果用了早停)
                 if hasattr(model, 'best_score_') and model.best_score_:
@@ -417,18 +486,18 @@ def model_features_select(
                          # 回退用完整模型在验证集预测
                          if metric == 'neg_log_loss': preds_final = model.predict_proba(X_val_lgb)
                          else: preds_final = model.predict(X_val_lgb)
-                         final_score = _calculate_metric(metric, y_val_lgb, preds_final)
+                         final_score = _calculate_metric(metric, y_val_lgb, preds_final, logger)
                 else: # 没有早停或 best_score_,用最后预测评估
                      logger.debug("未使用早停或无 best_score_,使用最终模型在验证集上的评估分数")
                      if metric == 'neg_log_loss': preds_final = model.predict_proba(X_val_lgb)
                      else: preds_final = model.predict(X_val_lgb)
-                     final_score = _calculate_metric(metric, y_val_lgb, preds_final)
+                     final_score = _calculate_metric(metric, y_val_lgb, preds_final, logger)
         else: # 模型不支持重要性
             logger.warning("模型不支持 feature_importances_,返回所有特征")
-            selected_features = list(X_train.columns)
+            selected_features = list(X_train_lgb.columns)
             if metric == 'neg_log_loss': preds = model.predict_proba(X_val_lgb)
             else: preds = model.predict(X_val_lgb)
-            final_score = _calculate_metric(metric, y_val_lgb, preds)
+            final_score = _calculate_metric(metric, y_val_lgb, preds, logger)
 
     except ImportError as imp_err: # 已在函数开始检查,但再次捕获以防万一
          logger.error(f"ImportError: {imp_err}")
@@ -446,9 +515,7 @@ def model_features_select(
 
     return selected_features, float(final_score) # 确保返回 float
 
-# --- 重新定义 _calculate_metric (内部辅助) ---
-# (代码与 espml.autofe.model 中的版本保持一致,)
-def _calculate_metric(metric_name: str, y_true: pd.Series, y_pred: np.ndarray) -> float:
+def _calculate_metric(metric_name: str, y_true: pd.Series, y_pred: np.ndarray, logger: Any) -> float:
     """(内部函数) 根据配置的 metric 计算得分"""
     try:
         if metric_name == 'rmse':

@@ -1,0 +1,968 @@
+日志大概是这样：需要推测怎么实现的
+```conf
+2025-04-15 16:36:31,617 - changtianml.module.util.wind_incrml - INFO - Finish loading data....
+2025-04-15 16:36:33,169 - changtianml.module.util.wind_incrml - INFO - the Forecast4Day 2025-02-18 07:00:00 training task start.
+2025-04-15 16:36:33,889 - changtianml.module.ml - INFO - start training 106 round trail.
+2025-04-15 16:36:33,889 - changtianml.module.ml - INFO - start changtianml fit...
+2025-04-15 16:36:39,546 - changtianml.module.ml - INFO - origin data train val rmse: 4.096841749741168
+2025-04-15 16:37:02,760 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.096841749741167
+2025-04-15 16:37:02,761 - changtianml.module.ml - INFO - dfs 1 algorithm search 128 features get advance 0 features.
+2025-04-15 16:37:24,903 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.096841749741167
+2025-04-15 16:37:24,904 - changtianml.module.ml - INFO - dfs 2 algorithm search 128 features get advance 0 features.
+2025-04-15 16:37:47,138 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.096841749741167
+2025-04-15 16:37:47,139 - changtianml.module.ml - INFO - dfs 3 algorithm search 128 features get advance 0 features.
+2025-04-15 16:38:10,349 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.096841749741167
+2025-04-15 16:38:10,349 - changtianml.module.ml - INFO - dfs 4 algorithm search 128 features get advance 0 features.
+2025-04-15 16:38:32,910 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.077978765684847
+2025-04-15 16:38:32,911 - changtianml.module.ml - INFO - dfs 5 algorithm search 128 features get advance 13 features.
+2025-04-15 16:38:38,801 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.077978765684846
+2025-04-15 16:38:38,818 - changtianml.module.ml - INFO - autofe finished, search 13 features
+[flaml.automl.logger: 04-15 16:43:40] {835} INFO - log file name /data/model/Forecast4Day_backtrack/106/automl/logs
+[flaml.automl.logger: 04-15 16:43:40] {888} INFO - estimator = lgbm, config = {'n_estimators': 397, 'num_leaves': 443, 'min_child_samples': 5, 'learning_rate': 0.15457402825532868, 'log_max_bin': 9, 'colsample_bytree': 0.8636562347788755, 'reg_alpha': 0.03424896601405476, 'reg_lambda': 2.237877728494342}, #training instances = 39272
+[flaml.automl.logger: 04-15 16:44:10] {919} INFO - retrain from log succeeded
+2025-04-15 16:44:11,085 - changtianml.module.ml - INFO - automl finished, best model can achieve rmse: 1.214918028643205
+2025-04-15 16:44:12,269 - changtianml.module.ml - INFO - finish training.
+2025-04-15 16:44:12,277 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 07:00:00 training task training successful.
+2025-04-15 16:44:12,286 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2025-02-14 08:00:00, 2025-02-18 08:00:00]
+2025-04-15 16:44:12,666 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 07:00:00 training task predict successful.
+2025-04-15 16:44:12,678 - changtianml.module.util.wind_incrml - INFO - loading data....
+2025-04-15 16:44:12,678 - changtianml.module.util.wind_incrml - INFO - loading tower data....
+2025-04-15 16:44:12,711 - changtianml.module.util.wind_incrml - INFO - [['2025/3/13 16:15', 53.87, 6.43, 0.0, 0.0, 0.0, 12.9827], ['2025/3/13 16:30', 45.4, 7.33, 0.0, 0.0, 0.0, 14.16]]
+2025-04-15 16:44:12,711 - changtianml.module.util.wind_incrml - INFO - loading weather /data/resource/weather.csv data....
+2025-04-15 16:44:18,993 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2023-10-24 22:15:00, 2025-04-09 05:00:00]
+2025-04-15 16:44:19,060 - changtianml.module.util.wind_incrml - INFO - Finish loading data....
+2025-04-15 16:44:20,734 - changtianml.module.util.wind_incrml - INFO - the Forecast5Day 2025-02-18 06:45:00 training task start.
+2025-04-15 16:44:21,445 - changtianml.module.ml - INFO - start training 106 round trail.
+2025-04-15 16:44:21,445 - changtianml.module.ml - INFO - start changtianml fit...
+2025-04-15 16:44:26,598 - changtianml.module.ml - INFO - origin data train val rmse: 4.151353908906717
+2025-04-15 16:44:49,791 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.151353908906717
+2025-04-15 16:44:49,792 - changtianml.module.ml - INFO - dfs 1 algorithm search 128 features get advance 0 features.
+2025-04-15 16:45:12,383 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.151353908906718
+2025-04-15 16:45:12,383 - changtianml.module.ml - INFO - dfs 2 algorithm search 128 features get advance 0 features.
+2025-04-15 16:45:34,710 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.151353908906717
+2025-04-15 16:45:34,711 - changtianml.module.ml - INFO - dfs 3 algorithm search 128 features get advance 0 features.
+2025-04-15 16:45:57,799 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.151353908906718
+2025-04-15 16:45:57,800 - changtianml.module.ml - INFO - dfs 4 algorithm search 128 features get advance 0 features.
+2025-04-15 16:46:19,715 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.16912116396867
+2025-04-15 16:46:19,716 - changtianml.module.ml - INFO - dfs 5 algorithm search 128 features get advance 0 features.
+2025-04-15 16:46:19,740 - changtianml.module.ml - INFO - autofe finished, search 0 features
+[flaml.automl.logger: 04-15 16:51:20] {835} INFO - log file name /data/model/Forecast5Day_backtrack/106/automl/logs
+[flaml.automl.logger: 04-15 16:51:20] {888} INFO - estimator = xgb_limitdepth, config = {'n_estimators': 571, 'max_depth': 9, 'min_child_weight': 0.4595573684329631, 'learning_rate': 0.12159227831129771, 'subsample': 1.0, 'colsample_bylevel': 1.0, 'colsample_bytree': 0.9206965522887315, 'reg_alpha': 0.001402337140217246, 'reg_lambda': 0.42216350389758656}, #training instances = 39175
+[flaml.automl.logger: 04-15 16:51:42] {919} INFO - retrain from log succeeded
+2025-04-15 16:51:42,288 - changtianml.module.ml - INFO - automl finished, best model can achieve rmse: 1.5650490476280476
+2025-04-15 16:51:43,399 - changtianml.module.ml - INFO - finish training.
+2025-04-15 16:51:43,406 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:45:00 training task training successful.
+2025-04-15 16:51:43,414 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2025-02-13 08:00:00, 2025-02-18 08:00:00]
+2025-04-15 16:51:43,698 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:45:00 training task predict successful.
+2025-04-15 16:51:43,710 - changtianml.module.util.wind_incrml - INFO - loading data....
+2025-04-15 16:51:43,710 - changtianml.module.util.wind_incrml - INFO - loading tower data....
+2025-04-15 16:51:43,782 - changtianml.module.util.wind_incrml - INFO - [['2025/3/13 16:15', 53.87, 6.43, 0.0, 0.0, 0.0, 12.9827], ['2025/3/13 16:30', 45.4, 7.33, 0.0, 0.0, 0.0, 14.16]]
+2025-04-15 16:51:43,782 - changtianml.module.util.wind_incrml - INFO - loading weather /data/resource/weather.csv data....
+2025-04-15 16:51:50,124 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2023-10-24 22:15:00, 2025-04-09 05:00:00]
+2025-04-15 16:51:50,191 - changtianml.module.util.wind_incrml - INFO - Finish loading data....
+2025-04-15 16:51:51,773 - changtianml.module.util.wind_incrml - INFO - the Forecast6Day 2025-02-18 06:30:00 training task start.
+2025-04-15 16:51:52,603 - changtianml.module.ml - INFO - start training 106 round trail.
+2025-04-15 16:51:52,604 - changtianml.module.ml - INFO - start changtianml fit...
+2025-04-15 16:51:58,309 - changtianml.module.ml - INFO - origin data train val rmse: 4.222411534312133
+2025-04-15 16:52:21,234 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.2224115343121325
+2025-04-15 16:52:21,235 - changtianml.module.ml - INFO - dfs 1 algorithm search 128 features get advance 0 features.
+2025-04-15 16:52:43,880 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.222411534312133
+2025-04-15 16:52:43,880 - changtianml.module.ml - INFO - dfs 2 algorithm search 128 features get advance 0 features.
+2025-04-15 16:53:06,915 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.222411534312133
+2025-04-15 16:53:06,915 - changtianml.module.ml - INFO - dfs 3 algorithm search 128 features get advance 0 features.
+2025-04-15 16:53:29,817 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.2224115343121325
+2025-04-15 16:53:29,818 - changtianml.module.ml - INFO - dfs 4 algorithm search 128 features get advance 0 features.
+2025-04-15 16:53:52,692 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.248030628276249
+2025-04-15 16:53:52,693 - changtianml.module.ml - INFO - dfs 5 algorithm search 128 features get advance 0 features.
+2025-04-15 16:53:52,718 - changtianml.module.ml - INFO - autofe finished, search 0 features
+[flaml.automl.logger: 04-15 16:58:53] {835} INFO - log file name /data/model/Forecast6Day_backtrack/106/automl/logs
+[flaml.automl.logger: 04-15 16:58:53] {888} INFO - estimator = lgbm, config = {'n_estimators': 397, 'num_leaves': 443, 'min_child_samples': 5, 'learning_rate': 0.15457402825532868, 'log_max_bin': 9, 'colsample_bytree': 0.8636562347788755, 'reg_alpha': 0.03424896601405476, 'reg_lambda': 2.237877728494342}, #training instances = 39078
+[flaml.automl.logger: 04-15 16:59:16] {919} INFO - retrain from log succeeded
+2025-04-15 16:59:16,269 - changtianml.module.ml - INFO - automl finished, best model can achieve rmse: 1.141372431774573
+2025-04-15 16:59:17,409 - changtianml.module.ml - INFO - finish training.
+2025-04-15 16:59:17,417 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:30:00 training task training successful.
+2025-04-15 16:59:17,426 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2025-02-12 08:00:00, 2025-02-18 08:00:00]
+2025-04-15 16:59:17,813 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:30:00 training task predict successful.
+2025-04-15 16:59:17,825 - changtianml.module.util.wind_incrml - INFO - loading data....
+2025-04-15 16:59:17,825 - changtianml.module.util.wind_incrml - INFO - loading tower data....
+2025-04-15 16:59:17,857 - changtianml.module.util.wind_incrml - INFO - [['2025/3/13 16:15', 53.87, 6.43, 0.0, 0.0, 0.0, 12.9827], ['2025/3/13 16:30', 45.4, 7.33, 0.0, 0.0, 0.0, 14.16]]
+2025-04-15 16:59:17,857 - changtianml.module.util.wind_incrml - INFO - loading weather /data/resource/weather.csv data....
+2025-04-15 16:59:24,152 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2023-10-24 22:15:00, 2025-04-09 05:00:00]
+2025-04-15 16:59:24,220 - changtianml.module.util.wind_incrml - INFO - Finish loading data....
+2025-04-15 16:59:25,905 - changtianml.module.util.wind_incrml - INFO - the Forecast7Day 2025-02-18 06:15:00 training task start.
+2025-04-15 16:59:26,616 - changtianml.module.ml - INFO - start training 106 round trail.
+2025-04-15 16:59:26,617 - changtianml.module.ml - INFO - start changtianml fit...
+2025-04-15 16:59:32,324 - changtianml.module.ml - INFO - origin data train val rmse: 4.165684023543225
+2025-04-15 16:59:55,383 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.165684023543225
+2025-04-15 16:59:55,384 - changtianml.module.ml - INFO - dfs 1 algorithm search 128 features get advance 0 features.
+2025-04-15 17:00:18,158 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.165684023543224
+2025-04-15 17:00:18,158 - changtianml.module.ml - INFO - dfs 2 algorithm search 128 features get advance 0 features.
+2025-04-15 17:00:40,639 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.165684023543225
+2025-04-15 17:00:40,640 - changtianml.module.ml - INFO - dfs 3 algorithm search 128 features get advance 0 features.
+2025-04-15 17:01:02,884 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.165684023543224
+2025-04-15 17:01:02,885 - changtianml.module.ml - INFO - dfs 4 algorithm search 128 features get advance 0 features.
+2025-04-15 17:01:26,635 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.152110406394685
+2025-04-15 17:01:26,635 - changtianml.module.ml - INFO - dfs 5 algorithm search 128 features get advance 14 features.
+2025-04-15 17:01:33,875 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.152110406394685
+2025-04-15 17:01:33,891 - changtianml.module.ml - INFO - autofe finished, search 14 features
+[flaml.automl.logger: 04-15 17:06:35] {835} INFO - log file name /data/model/Forecast7Day_backtrack/106/automl/logs
+[flaml.automl.logger: 04-15 17:06:35] {888} INFO - estimator = lgbm, config = {'n_estimators': 157, 'num_leaves': 1114, 'min_child_samples': 7, 'learning_rate': 0.15129096194069813, 'log_max_bin': 9, 'colsample_bytree': 0.8045754336027955, 'reg_alpha': 0.07790880726894442, 'reg_lambda': 0.49588380115869723}, #training instances = 38981
+[flaml.automl.logger: 04-15 17:07:03] {919} INFO - retrain from log succeeded
+2025-04-15 17:07:03,297 - changtianml.module.ml - INFO - automl finished, best model can achieve rmse: 1.3272347798159263
+2025-04-15 17:07:04,443 - changtianml.module.ml - INFO - finish training.
+2025-04-15 17:07:04,447 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:15:00 training task training successful.
+2025-04-15 17:07:04,456 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2025-02-11 08:00:00, 2025-02-18 08:00:00]
+2025-04-15 17:07:04,776 - changtianml.module.util.wind_incrml - INFO - the 2025-02-18 06:15:00 training task predict successful.
+2025-04-15 17:07:04,789 - changtianml.module.util.wind_incrml - INFO - loading data....
+2025-04-15 17:07:04,789 - changtianml.module.util.wind_incrml - INFO - loading tower data....
+2025-04-15 17:07:04,821 - changtianml.module.util.wind_incrml - INFO - [['2025/3/13 16:15', 53.87, 6.43, 0.0, 0.0, 0.0, 12.9827], ['2025/3/13 16:30', 45.4, 7.33, 0.0, 0.0, 0.0, 14.16]]
+2025-04-15 17:07:04,822 - changtianml.module.util.wind_incrml - INFO - loading weather /data/resource/weather.csv data....
+2025-04-15 17:07:11,075 - changtianml.module.util.wind_incrml - INFO - make sure Data is available every 15 minutes in range [2023-10-24 22:15:00, 2025-04-09 05:00:00]
+2025-04-15 17:07:11,143 - changtianml.module.util.wind_incrml - INFO - Finish loading data....
+2025-04-15 17:07:12,763 - changtianml.module.util.wind_incrml - INFO - the Forecast8Day 2025-02-18 06:00:00 training task start.
+2025-04-15 17:07:13,436 - changtianml.module.ml - INFO - start training 106 round trail.
+2025-04-15 17:07:13,437 - changtianml.module.ml - INFO - start changtianml fit...
+2025-04-15 17:07:19,006 - changtianml.module.ml - INFO - origin data train val rmse: 4.2594261588126905
+2025-04-15 17:07:41,209 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.259426158812691
+2025-04-15 17:07:41,210 - changtianml.module.ml - INFO - dfs 1 algorithm search 128 features get advance 0 features.
+2025-04-15 17:08:04,273 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.2594261588126905
+2025-04-15 17:08:04,273 - changtianml.module.ml - INFO - dfs 2 algorithm search 128 features get advance 0 features.
+2025-04-15 17:08:26,507 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.2594261588126905
+2025-04-15 17:08:26,508 - changtianml.module.ml - INFO - dfs 3 algorithm search 128 features get advance 0 features.
+2025-04-15 17:08:51,181 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.2594261588126905
+2025-04-15 17:08:51,182 - changtianml.module.ml - INFO - dfs 4 algorithm search 128 features get advance 0 features.
+2025-04-15 17:09:13,255 - changtianml.module.ml - INFO - Autofe Trial finished with value: 4.291396030396093
+2025-04-15 17:09:13,255 - changtianml.module.ml - INFO - dfs 5 algorithm search 128 features get advance 0 features.
+2025-04-15 17:09:13,282 - changtianml.module.ml - INFO - autofe finished, search 0 features
+```
+
+
+
+目标结果示例：
+```conf
+root@JiangSuChangZhou-CU-DELLR730:~# tree /home/wangtinghu/data/
+/home/wangtinghu/data/
+├── logs
+│   ├── Forecast10Day_backtracking.log
+│   ├── Forecast11Day_backtracking.log
+│   ├── Forecast1Day_backtracking.log
+│   ├── Forecast2Day_backtracking.log
+│   ├── Forecast3Day_backtracking.log
+│   ├── Forecast4Day_backtracking.log
+│   ├── Forecast4Hour_backtracking.log
+│   ├── Forecast5Day_backtracking.log
+│   ├── Forecast6Day_backtracking.log
+│   ├── Forecast7Day_backtracking.log
+│   ├── Forecast8Day_backtracking.log
+│   └── Forecast9Day_backtracking.log
+├── model
+│   ├── Forecast10Day_backtrack
+│   │   ├── 106
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 107
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast11Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast1Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast2Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast3Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast4Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast4Hour_backtrack
+│   │   ├── 888
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 889
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast5Day_backtrack
+│   │   ├── 105
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 106
+│   │       ├── autofe
+│   │       └── automl
+│   │           └── logs
+│   ├── Forecast6Day_backtrack
+│   │   ├── 104
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 105
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast7Day_backtrack
+│   │   ├── 104
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 105
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   ├── Forecast8Day_backtrack
+│   │   ├── 104
+│   │   │   ├── autofe
+│   │   │   │   ├── features.csv
+│   │   │   │   ├── labelencoder.pkl
+│   │   │   │   ├── record.csv
+│   │   │   │   └── result
+│   │   │   └── automl
+│   │   │       ├── logs
+│   │   │       ├── result
+│   │   │       ├── val_logs
+│   │   │       └── val_res
+│   │   └── 105
+│   │       ├── autofe
+│   │       │   ├── features.csv
+│   │       │   ├── labelencoder.pkl
+│   │       │   ├── record.csv
+│   │       │   └── result
+│   │       └── automl
+│   │           ├── logs
+│   │           ├── result
+│   │           ├── val_logs
+│   │           └── val_res
+│   └── Forecast9Day_backtrack
+│       ├── 104
+│       │   ├── autofe
+│       │   │   ├── features.csv
+│       │   │   ├── labelencoder.pkl
+│       │   │   ├── record.csv
+│       │   │   └── result
+│       │   └── automl
+│       │       ├── logs
+│       │       ├── result
+│       │       ├── val_logs
+│       │       └── val_res
+│       └── 105
+│           ├── autofe
+│           │   ├── features.csv
+│           │   ├── labelencoder.pkl
+│           │   ├── record.csv
+│           │   └── result
+│           └── automl
+│               ├── logs
+│               ├── result
+│               ├── val_logs
+│               └── val_res
+├── pred
+│   ├── backtrack_20250101_0515_Forecast11Day.csv
+│   ├── backtrack_20250101_0530_Forecast10Day.csv
+│   ├── backtrack_20250101_0545_Forecast9Day.csv
+│   ├── backtrack_20250101_0600_Forecast8Day.csv
+│   ├── backtrack_20250101_0615_Forecast7Day.csv
+│   ├── backtrack_20250101_0630_Forecast6Day.csv
+│   ├── backtrack_20250101_0645_Forecast5Day.csv
+│   ├── backtrack_20250101_0700_Forecast4Day.csv
+│   ├── backtrack_20250101_0715_Forecast3Day.csv
+│   ├── backtrack_20250101_0730_Forecast2Day.csv
+│   ├── backtrack_20250101_0745_Forecast1Day.csv
+│   ├── backtrack_20250102_0515_Forecast11Day.csv
+│   ├── backtrack_20250102_0530_Forecast10Day.csv
+│   ├── backtrack_20250102_0545_Forecast9Day.csv
+│   ├── backtrack_20250102_0600_Forecast8Day.csv
+│   ├── backtrack_20250102_0615_Forecast7Day.csv
+│   ├── backtrack_20250102_0630_Forecast6Day.csv
+│   ├── backtrack_20250102_0645_Forecast5Day.csv
+│   ├── backtrack_20250102_0700_Forecast4Day.csv
+│   ├── backtrack_20250102_0715_Forecast3Day.csv
+│   ├── backtrack_20250102_0730_Forecast2Day.csv
+│   ├── backtrack_20250102_0745_Forecast1Day.csv
+│   ├── backtrack_20250103_0515_Forecast11Day.csv
+│   ├── backtrack_20250103_0530_Forecast10Day.csv
+│   ├── backtrack_20250103_0545_Forecast9Day.csv
+│   ├── backtrack_20250103_0600_Forecast8Day.csv
+│   ├── backtrack_20250103_0615_Forecast7Day.csv
+│   ├── backtrack_20250103_0630_Forecast6Day.csv
+│   ├── backtrack_20250103_0645_Forecast5Day.csv
+│   ├── backtrack_20250103_0700_Forecast4Day.csv
+│   ├── backtrack_20250103_0715_Forecast3Day.csv
+│   ├── backtrack_20250103_0730_Forecast2Day.csv
+│   ├── backtrack_20250103_0745_Forecast1Day.csv
+│   ├── backtrack_20250104_0515_Forecast11Day.csv
+│   ├── backtrack_20250104_0530_Forecast10Day.csv
+│   ├── backtrack_20250104_0545_Forecast9Day.csv
+│   ├── backtrack_20250104_0600_Forecast8Day.csv
+│   ├── backtrack_20250104_0615_Forecast7Day.csv
+│   ├── backtrack_20250104_0630_Forecast6Day.csv
+│   ├── backtrack_20250104_0645_Forecast5Day.csv
+│   ├── backtrack_20250104_0700_Forecast4Day.csv
+│   ├── backtrack_20250104_0715_Forecast3Day.csv
+│   ├── backtrack_20250104_0730_Forecast2Day.csv
+│   ├── backtrack_20250104_0745_Forecast1Day.csv
+│   ├── backtrack_20250105_0515_Forecast11Day.csv
+│   ├── backtrack_20250105_0530_Forecast10Day.csv
+│   ├── backtrack_20250105_0545_Forecast9Day.csv
+│   ├── backtrack_20250105_0600_Forecast8Day.csv
+│   ├── backtrack_20250105_0615_Forecast7Day.csv
+│   ├── backtrack_20250105_0630_Forecast6Day.csv
+│   ├── backtrack_20250105_0645_Forecast5Day.csv
+│   ├── backtrack_20250105_0700_Forecast4Day.csv
+│   ├── backtrack_20250105_0715_Forecast3Day.csv
+│   ├── backtrack_20250105_0730_Forecast2Day.csv
+│   ├── backtrack_20250105_0745_Forecast1Day.csv
+│   ├── backtrack_20250106_0515_Forecast11Day.csv
+│   ├── backtrack_20250106_0530_Forecast10Day.csv
+│   ├── backtrack_20250106_0545_Forecast9Day.csv
+│   ├── backtrack_20250106_0600_Forecast8Day.csv
+│   ├── backtrack_20250106_0615_Forecast7Day.csv
+│   ├── backtrack_20250106_0630_Forecast6Day.csv
+│   ├── backtrack_20250106_0645_Forecast5Day.csv
+│   ├── backtrack_20250106_0700_Forecast4Day.csv
+│   ├── backtrack_20250106_0715_Forecast3Day.csv
+│   ├── backtrack_20250106_0730_Forecast2Day.csv
+│   ├── backtrack_20250106_0745_Forecast1Day.csv
+│   ├── backtrack_20250107_0515_Forecast11Day.csv
+│   ├── backtrack_20250107_0530_Forecast10Day.csv
+│   ├── backtrack_20250107_0545_Forecast9Day.csv
+│   ├── backtrack_20250107_0600_Forecast8Day.csv
+│   ├── backtrack_20250107_0615_Forecast7Day.csv
+│   ├── backtrack_20250107_0630_Forecast6Day.csv
+│   ├── backtrack_20250107_0645_Forecast5Day.csv
+│   ├── backtrack_20250107_0700_Forecast4Day.csv
+│   ├── backtrack_20250107_0715_Forecast3Day.csv
+│   ├── backtrack_20250107_0730_Forecast2Day.csv
+│   ├── backtrack_20250107_0745_Forecast1Day.csv
+│   ├── backtrack_20250108_0515_Forecast11Day.csv
+│   ├── backtrack_20250108_0530_Forecast10Day.csv
+│   ├── backtrack_20250108_0545_Forecast9Day.csv
+│   ├── backtrack_20250108_0600_Forecast8Day.csv
+│   ├── backtrack_20250108_0615_Forecast7Day.csv
+│   ├── backtrack_20250108_0630_Forecast6Day.csv
+│   ├── backtrack_20250108_0645_Forecast5Day.csv
+│   ├── backtrack_20250108_0700_Forecast4Day.csv
+│   ├── backtrack_20250108_0715_Forecast3Day.csv
+│   ├── backtrack_20250108_0730_Forecast2Day.csv
+│   ├── backtrack_20250108_0745_Forecast1Day.csv
+│   ├── backtrack_20250109_0515_Forecast11Day.csv
+│   ├── backtrack_20250109_0530_Forecast10Day.csv
+│   ├── backtrack_20250109_0545_Forecast9Day.csv
+│   ├── backtrack_20250109_0600_Forecast8Day.csv
+│   ├── backtrack_20250109_0615_Forecast7Day.csv
+│   ├── backtrack_20250109_0630_Forecast6Day.csv
+│   ├── backtrack_20250109_0645_Forecast5Day.csv
+│   ├── backtrack_20250109_0700_Forecast4Day.csv
+│   ├── backtrack_20250109_0715_Forecast3Day.csv
+│   ├── backtrack_20250109_0730_Forecast2Day.csv
+│   ├── backtrack_20250109_0745_Forecast1Day.csv
+│   ├── backtrack_20250110_0515_Forecast11Day.csv
+│   ├── backtrack_20250110_0530_Forecast10Day.csv
+│   ├── backtrack_20250110_0545_Forecast9Day.csv
+│   ├── backtrack_20250110_0600_Forecast8Day.csv
+│   ├── backtrack_20250110_0615_Forecast7Day.csv
+│   ├── backtrack_20250110_0630_Forecast6Day.csv
+│   ├── backtrack_20250110_0645_Forecast5Day.csv
+│   ├── backtrack_20250110_0700_Forecast4Day.csv
+│   ├── backtrack_20250110_0715_Forecast3Day.csv
+│   ├── backtrack_20250110_0730_Forecast2Day.csv
+│   ├── backtrack_20250110_0745_Forecast1Day.csv
+│   ├── backtrack_20250111_0515_Forecast11Day.csv
+│   ├── backtrack_20250111_0530_Forecast10Day.csv
+│   ├── backtrack_20250111_0545_Forecast9Day.csv
+│   ├── backtrack_20250111_0600_Forecast8Day.csv
+│   ├── backtrack_20250111_0615_Forecast7Day.csv
+│   ├── backtrack_20250111_0630_Forecast6Day.csv
+│   ├── backtrack_20250111_0645_Forecast5Day.csv
+│   ├── backtrack_20250111_0700_Forecast4Day.csv
+│   ├── backtrack_20250111_0715_Forecast3Day.csv
+│   ├── backtrack_20250111_0730_Forecast2Day.csv
+│   ├── backtrack_20250111_0745_Forecast1Day.csv
+│   ├── backtrack_20250112_0515_Forecast11Day.csv
+│   ├── backtrack_20250112_0530_Forecast10Day.csv
+│   ├── backtrack_20250112_0545_Forecast9Day.csv
+│   ├── backtrack_20250112_0600_Forecast8Day.csv
+│   ├── backtrack_20250112_0615_Forecast7Day.csv
+│   ├── backtrack_20250112_0630_Forecast6Day.csv
+│   ├── backtrack_20250112_0645_Forecast5Day.csv
+│   ├── backtrack_20250112_0700_Forecast4Day.csv
+│   ├── backtrack_20250112_0715_Forecast3Day.csv
+│   ├── backtrack_20250112_0730_Forecast2Day.csv
+│   ├── backtrack_20250112_0745_Forecast1Day.csv
+│   ├── backtrack_20250113_0515_Forecast11Day.csv
+│   ├── backtrack_20250113_0530_Forecast10Day.csv
+│   ├── backtrack_20250113_0545_Forecast9Day.csv
+│   ├── backtrack_20250113_0600_Forecast8Day.csv
+│   ├── backtrack_20250113_0615_Forecast7Day.csv
+│   ├── backtrack_20250113_0630_Forecast6Day.csv
+│   ├── backtrack_20250113_0645_Forecast5Day.csv
+│   ├── backtrack_20250113_0700_Forecast4Day.csv
+│   ├── backtrack_20250113_0715_Forecast3Day.csv
+│   ├── backtrack_20250113_0730_Forecast2Day.csv
+│   ├── backtrack_20250113_0745_Forecast1Day.csv
+│   ├── backtrack_20250114_0515_Forecast11Day.csv
+│   ├── backtrack_20250114_0530_Forecast10Day.csv
+│   ├── backtrack_20250114_0545_Forecast9Day.csv
+│   ├── backtrack_20250114_0600_Forecast8Day.csv
+│   ├── backtrack_20250114_0615_Forecast7Day.csv
+│   ├── backtrack_20250114_0630_Forecast6Day.csv
+│   ├── backtrack_20250114_0645_Forecast5Day.csv
+│   ├── backtrack_20250114_0700_Forecast4Day.csv
+│   ├── backtrack_20250114_0715_Forecast3Day.csv
+│   ├── backtrack_20250114_0730_Forecast2Day.csv
+│   ├── backtrack_20250114_0745_Forecast1Day.csv
+│   ├── backtrack_20250115_0515_Forecast11Day.csv
+│   ├── backtrack_20250115_0530_Forecast10Day.csv
+│   ├── backtrack_20250115_0545_Forecast9Day.csv
+│   ├── backtrack_20250115_0600_Forecast8Day.csv
+│   ├── backtrack_20250115_0615_Forecast7Day.csv
+│   ├── backtrack_20250115_0630_Forecast6Day.csv
+│   ├── backtrack_20250115_0645_Forecast5Day.csv
+│   ├── backtrack_20250115_0700_Forecast4Day.csv
+│   ├── backtrack_20250115_0715_Forecast3Day.csv
+│   ├── backtrack_20250115_0730_Forecast2Day.csv
+│   ├── backtrack_20250115_0745_Forecast1Day.csv
+│   ├── backtrack_20250116_0515_Forecast11Day.csv
+│   ├── backtrack_20250116_0530_Forecast10Day.csv
+│   ├── backtrack_20250116_0545_Forecast9Day.csv
+│   ├── backtrack_20250116_0600_Forecast8Day.csv
+│   ├── backtrack_20250116_0615_Forecast7Day.csv
+│   ├── backtrack_20250116_0630_Forecast6Day.csv
+│   ├── backtrack_20250116_0645_Forecast5Day.csv
+│   ├── backtrack_20250116_0700_Forecast4Day.csv
+│   ├── backtrack_20250116_0715_Forecast3Day.csv
+│   ├── backtrack_20250116_0730_Forecast2Day.csv
+│   ├── backtrack_20250116_0745_Forecast1Day.csv
+│   ├── backtrack_20250117_0515_Forecast11Day.csv
+│   ├── backtrack_20250117_0530_Forecast10Day.csv
+│   ├── backtrack_20250117_0545_Forecast9Day.csv
+│   ├── backtrack_20250117_0600_Forecast8Day.csv
+│   ├── backtrack_20250117_0615_Forecast7Day.csv
+│   ├── backtrack_20250117_0630_Forecast6Day.csv
+│   ├── backtrack_20250117_0645_Forecast5Day.csv
+│   ├── backtrack_20250117_0700_Forecast4Day.csv
+│   ├── backtrack_20250117_0715_Forecast3Day.csv
+│   ├── backtrack_20250117_0730_Forecast2Day.csv
+│   ├── backtrack_20250117_0745_Forecast1Day.csv
+│   ├── backtrack_20250118_0515_Forecast11Day.csv
+│   ├── backtrack_20250118_0530_Forecast10Day.csv
+│   ├── backtrack_20250118_0545_Forecast9Day.csv
+│   ├── backtrack_20250118_0600_Forecast8Day.csv
+│   ├── backtrack_20250118_0615_Forecast7Day.csv
+│   ├── backtrack_20250118_0630_Forecast6Day.csv
+│   ├── backtrack_20250118_0645_Forecast5Day.csv
+│   ├── backtrack_20250118_0700_Forecast4Day.csv
+│   ├── backtrack_20250118_0715_Forecast3Day.csv
+│   ├── backtrack_20250118_0730_Forecast2Day.csv
+│   ├── backtrack_20250118_0745_Forecast1Day.csv
+│   ├── backtrack_20250119_0515_Forecast11Day.csv
+│   ├── backtrack_20250119_0530_Forecast10Day.csv
+│   ├── backtrack_20250119_0545_Forecast9Day.csv
+│   ├── backtrack_20250119_0600_Forecast8Day.csv
+│   ├── backtrack_20250119_0615_Forecast7Day.csv
+│   ├── backtrack_20250119_0630_Forecast6Day.csv
+│   ├── backtrack_20250119_0645_Forecast5Day.csv
+│   ├── backtrack_20250119_0700_Forecast4Day.csv
+│   ├── backtrack_20250119_0715_Forecast3Day.csv
+│   ├── backtrack_20250119_0730_Forecast2Day.csv
+│   ├── backtrack_20250119_0745_Forecast1Day.csv
+│   ├── backtrack_20250120_0515_Forecast11Day.csv
+│   ├── backtrack_20250120_0530_Forecast10Day.csv
+│   ├── backtrack_20250120_0545_Forecast9Day.csv
+│   ├── backtrack_20250120_0600_Forecast8Day.csv
+│   ├── backtrack_20250120_0615_Forecast7Day.csv
+│   ├── backtrack_20250120_0630_Forecast6Day.csv
+│   ├── backtrack_20250120_0645_Forecast5Day.csv
+│   ├── backtrack_20250120_0700_Forecast4Day.csv
+│   ├── backtrack_20250120_0715_Forecast3Day.csv
+│   ├── backtrack_20250120_0730_Forecast2Day.csv
+│   ├── backtrack_20250120_0745_Forecast1Day.csv
+│   ├── backtrack_20250121_0515_Forecast11Day.csv
+│   ├── backtrack_20250121_0530_Forecast10Day.csv
+│   ├── backtrack_20250121_0545_Forecast9Day.csv
+│   ├── backtrack_20250121_0600_Forecast8Day.csv
+│   ├── backtrack_20250121_0615_Forecast7Day.csv
+│   ├── backtrack_20250121_0630_Forecast6Day.csv
+│   ├── backtrack_20250121_0645_Forecast5Day.csv
+│   ├── backtrack_20250121_0700_Forecast4Day.csv
+│   ├── backtrack_20250121_0715_Forecast3Day.csv
+│   ├── backtrack_20250121_0730_Forecast2Day.csv
+│   ├── backtrack_20250121_0745_Forecast1Day.csv
+│   ├── backtrack_20250122_0515_Forecast11Day.csv
+│   ├── backtrack_20250122_0530_Forecast10Day.csv
+│   ├── backtrack_20250122_0545_Forecast9Day.csv
+│   ├── backtrack_20250122_0600_Forecast8Day.csv
+│   ├── backtrack_20250122_0615_Forecast7Day.csv
+│   ├── backtrack_20250122_0630_Forecast6Day.csv
+│   ├── backtrack_20250122_0645_Forecast5Day.csv
+│   ├── backtrack_20250122_0700_Forecast4Day.csv
+│   ├── backtrack_20250122_0715_Forecast3Day.csv
+│   ├── backtrack_20250122_0730_Forecast2Day.csv
+│   ├── backtrack_20250122_0745_Forecast1Day.csv
+│   ├── backtrack_20250123_0515_Forecast11Day.csv
+│   ├── backtrack_20250123_0530_Forecast10Day.csv
+│   ├── backtrack_20250123_0545_Forecast9Day.csv
+│   ├── backtrack_20250123_0600_Forecast8Day.csv
+│   ├── backtrack_20250123_0615_Forecast7Day.csv
+│   ├── backtrack_20250123_0630_Forecast6Day.csv
+│   ├── backtrack_20250123_0645_Forecast5Day.csv
+│   ├── backtrack_20250123_0700_Forecast4Day.csv
+│   ├── backtrack_20250123_0715_Forecast3Day.csv
+│   ├── backtrack_20250123_0730_Forecast2Day.csv
+│   ├── backtrack_20250123_0745_Forecast1Day.csv
+│   ├── backtrack_20250124_0515_Forecast11Day.csv
+│   ├── backtrack_20250124_0530_Forecast10Day.csv
+│   ├── backtrack_20250124_0545_Forecast9Day.csv
+│   ├── backtrack_20250124_0600_Forecast8Day.csv
+│   ├── backtrack_20250124_0615_Forecast7Day.csv
+│   ├── backtrack_20250124_0630_Forecast6Day.csv
+│   ├── backtrack_20250124_0645_Forecast5Day.csv
+│   ├── backtrack_20250124_0700_Forecast4Day.csv
+│   ├── backtrack_20250124_0715_Forecast3Day.csv
+│   ├── backtrack_20250124_0730_Forecast2Day.csv
+│   ├── backtrack_20250124_0745_Forecast1Day.csv
+│   ├── backtrack_20250125_0515_Forecast11Day.csv
+│   ├── backtrack_20250125_0530_Forecast10Day.csv
+│   ├── backtrack_20250125_0545_Forecast9Day.csv
+│   ├── backtrack_20250125_0600_Forecast8Day.csv
+│   ├── backtrack_20250125_0615_Forecast7Day.csv
+│   ├── backtrack_20250125_0630_Forecast6Day.csv
+│   ├── backtrack_20250125_0645_Forecast5Day.csv
+│   ├── backtrack_20250125_0700_Forecast4Day.csv
+│   ├── backtrack_20250125_0715_Forecast3Day.csv
+│   ├── backtrack_20250125_0730_Forecast2Day.csv
+│   ├── backtrack_20250125_0745_Forecast1Day.csv
+│   ├── backtrack_20250126_0515_Forecast11Day.csv
+│   ├── backtrack_20250126_0530_Forecast10Day.csv
+│   ├── backtrack_20250126_0545_Forecast9Day.csv
+│   ├── backtrack_20250126_0600_Forecast8Day.csv
+│   ├── backtrack_20250126_0615_Forecast7Day.csv
+│   ├── backtrack_20250126_0630_Forecast6Day.csv
+│   ├── backtrack_20250126_0645_Forecast5Day.csv
+│   ├── backtrack_20250126_0700_Forecast4Day.csv
+│   ├── backtrack_20250126_0715_Forecast3Day.csv
+│   ├── backtrack_20250126_0730_Forecast2Day.csv
+│   ├── backtrack_20250126_0745_Forecast1Day.csv
+│   ├── backtrack_20250127_0515_Forecast11Day.csv
+│   ├── backtrack_20250127_0530_Forecast10Day.csv
+│   ├── backtrack_20250127_0545_Forecast9Day.csv
+│   ├── backtrack_20250127_0600_Forecast8Day.csv
+│   ├── backtrack_20250127_0615_Forecast7Day.csv
+│   ├── backtrack_20250127_0630_Forecast6Day.csv
+│   ├── backtrack_20250127_0645_Forecast5Day.csv
+│   ├── backtrack_20250127_0700_Forecast4Day.csv
+│   ├── backtrack_20250127_0715_Forecast3Day.csv
+│   ├── backtrack_20250127_0730_Forecast2Day.csv
+│   ├── backtrack_20250127_0745_Forecast1Day.csv
+│   ├── backtrack_20250128_0515_Forecast11Day.csv
+│   ├── backtrack_20250128_0530_Forecast10Day.csv
+│   ├── backtrack_20250128_0545_Forecast9Day.csv
+│   ├── backtrack_20250128_0600_Forecast8Day.csv
+│   ├── backtrack_20250128_0615_Forecast7Day.csv
+│   ├── backtrack_20250128_0630_Forecast6Day.csv
+│   ├── backtrack_20250128_0645_Forecast5Day.csv
+│   ├── backtrack_20250128_0700_Forecast4Day.csv
+│   ├── backtrack_20250128_0715_Forecast3Day.csv
+│   ├── backtrack_20250128_0730_Forecast2Day.csv
+│   ├── backtrack_20250128_0745_Forecast1Day.csv
+│   ├── backtrack_20250129_0515_Forecast11Day.csv
+│   ├── backtrack_20250129_0530_Forecast10Day.csv
+│   ├── backtrack_20250129_0545_Forecast9Day.csv
+│   ├── backtrack_20250129_0600_Forecast8Day.csv
+│   ├── backtrack_20250129_0615_Forecast7Day.csv
+│   ├── backtrack_20250129_0630_Forecast6Day.csv
+│   ├── backtrack_20250129_0645_Forecast5Day.csv
+│   ├── backtrack_20250129_0700_Forecast4Day.csv
+│   ├── backtrack_20250129_0715_Forecast3Day.csv
+│   ├── backtrack_20250129_0730_Forecast2Day.csv
+│   ├── backtrack_20250129_0745_Forecast1Day.csv
+│   ├── backtrack_20250130_0515_Forecast11Day.csv
+│   ├── backtrack_20250130_0530_Forecast10Day.csv
+│   ├── backtrack_20250130_0545_Forecast9Day.csv
+│   ├── backtrack_20250130_0600_Forecast8Day.csv
+│   ├── backtrack_20250130_0615_Forecast7Day.csv
+│   ├── backtrack_20250130_0630_Forecast6Day.csv
+│   ├── backtrack_20250130_0645_Forecast5Day.csv
+│   ├── backtrack_20250130_0700_Forecast4Day.csv
+│   ├── backtrack_20250130_0715_Forecast3Day.csv
+│   ├── backtrack_20250130_0730_Forecast2Day.csv
+│   ├── backtrack_20250130_0745_Forecast1Day.csv
+│   ├── backtrack_20250131_0515_Forecast11Day.csv
+│   ├── backtrack_20250131_0530_Forecast10Day.csv
+│   ├── backtrack_20250131_0545_Forecast9Day.csv
+│   ├── backtrack_20250131_0600_Forecast8Day.csv
+│   ├── backtrack_20250131_0615_Forecast7Day.csv
+│   ├── backtrack_20250131_0630_Forecast6Day.csv
+│   ├── backtrack_20250131_0645_Forecast5Day.csv
+│   ├── backtrack_20250131_0700_Forecast4Day.csv
+│   ├── backtrack_20250131_0715_Forecast3Day.csv
+│   ├── backtrack_20250131_0730_Forecast2Day.csv
+│   ├── backtrack_20250131_0745_Forecast1Day.csv
+│   ├── backtrack_20250201_0515_Forecast11Day.csv
+│   ├── backtrack_20250201_0530_Forecast10Day.csv
+│   ├── backtrack_20250201_0545_Forecast9Day.csv
+│   ├── backtrack_20250201_0600_Forecast8Day.csv
+│   ├── backtrack_20250201_0615_Forecast7Day.csv
+│   ├── backtrack_20250201_0630_Forecast6Day.csv
+│   ├── backtrack_20250201_0645_Forecast5Day.csv
+│   ├── backtrack_20250201_0700_Forecast4Day.csv
+│   ├── backtrack_20250201_0715_Forecast3Day.csv
+│   ├── backtrack_20250201_0730_Forecast2Day.csv
+│   ├── backtrack_20250201_0745_Forecast1Day.csv
+│   ├── backtrack_20250202_0515_Forecast11Day.csv
+│   ├── backtrack_20250202_0530_Forecast10Day.csv
+│   ├── backtrack_20250202_0545_Forecast9Day.csv
+│   ├── backtrack_20250202_0600_Forecast8Day.csv
+│   ├── backtrack_20250202_0615_Forecast7Day.csv
+│   ├── backtrack_20250202_0630_Forecast6Day.csv
+│   ├── backtrack_20250202_0645_Forecast5Day.csv
+│   ├── backtrack_20250202_0700_Forecast4Day.csv
+│   ├── backtrack_20250202_0715_Forecast3Day.csv
+│   ├── backtrack_20250202_0730_Forecast2Day.csv
+│   ├── backtrack_20250202_0745_Forecast1Day.csv
+│   ├── backtrack_20250203_0515_Forecast11Day.csv
+│   ├── backtrack_20250203_0530_Forecast10Day.csv
+│   ├── backtrack_20250203_0545_Forecast9Day.csv
+│   ├── backtrack_20250203_0600_Forecast8Day.csv
+│   ├── backtrack_20250203_0615_Forecast7Day.csv
+│   ├── backtrack_20250203_0630_Forecast6Day.csv
+│   ├── backtrack_20250203_0645_Forecast5Day.csv
+│   ├── backtrack_20250203_0700_Forecast4Day.csv
+│   ├── backtrack_20250203_0715_Forecast3Day.csv
+│   ├── backtrack_20250203_0730_Forecast2Day.csv
+│   ├── backtrack_20250203_0745_Forecast1Day.csv
+│   ├── backtrack_20250204_0515_Forecast11Day.csv
+│   ├── backtrack_20250204_0530_Forecast10Day.csv
+│   ├── backtrack_20250204_0545_Forecast9Day.csv
+│   ├── backtrack_20250204_0600_Forecast8Day.csv
+│   ├── backtrack_20250204_0615_Forecast7Day.csv
+│   ├── backtrack_20250204_0630_Forecast6Day.csv
+│   ├── backtrack_20250204_0645_Forecast5Day.csv
+│   ├── backtrack_20250204_0700_Forecast4Day.csv
+│   ├── backtrack_20250204_0715_Forecast3Day.csv
+│   ├── backtrack_20250204_0730_Forecast2Day.csv
+│   ├── backtrack_20250204_0745_Forecast1Day.csv
+│   ├── backtrack_20250205_0515_Forecast11Day.csv
+│   ├── backtrack_20250205_0530_Forecast10Day.csv
+│   ├── backtrack_20250205_0545_Forecast9Day.csv
+│   ├── backtrack_20250205_0600_Forecast8Day.csv
+│   ├── backtrack_20250205_0615_Forecast7Day.csv
+│   ├── backtrack_20250205_0630_Forecast6Day.csv
+│   ├── backtrack_20250205_0645_Forecast5Day.csv
+│   ├── backtrack_20250205_0700_Forecast4Day.csv
+│   ├── backtrack_20250205_0715_Forecast3Day.csv
+│   ├── backtrack_20250205_0730_Forecast2Day.csv
+│   ├── backtrack_20250205_0745_Forecast1Day.csv
+│   ├── backtrack_20250206_0515_Forecast11Day.csv
+│   ├── backtrack_20250206_0530_Forecast10Day.csv
+│   ├── backtrack_20250206_0545_Forecast9Day.csv
+│   ├── backtrack_20250206_0600_Forecast8Day.csv
+│   ├── backtrack_20250206_0615_Forecast7Day.csv
+│   ├── backtrack_20250206_0630_Forecast6Day.csv
+│   ├── backtrack_20250206_0645_Forecast5Day.csv
+│   ├── backtrack_20250206_0700_Forecast4Day.csv
+│   ├── backtrack_20250206_0715_Forecast3Day.csv
+│   ├── backtrack_20250206_0730_Forecast2Day.csv
+│   ├── backtrack_20250206_0745_Forecast1Day.csv
+│   ├── backtrack_20250207_0515_Forecast11Day.csv
+│   ├── backtrack_20250207_0530_Forecast10Day.csv
+│   ├── backtrack_20250207_0545_Forecast9Day.csv
+│   ├── backtrack_20250207_0600_Forecast8Day.csv
+│   ├── backtrack_20250207_0615_Forecast7Day.csv
+│   ├── backtrack_20250207_0630_Forecast6Day.csv
+│   ├── backtrack_20250207_0645_Forecast5Day.csv
+│   ├── backtrack_20250207_0700_Forecast4Day.csv
+│   ├── backtrack_20250207_0715_Forecast3Day.csv
+│   ├── backtrack_20250207_0730_Forecast2Day.csv
+│   ├── backtrack_20250207_0745_Forecast1Day.csv
+│   ├── backtrack_20250208_0515_Forecast11Day.csv
+│   ├── backtrack_20250208_0530_Forecast10Day.csv
+│   ├── backtrack_20250208_0545_Forecast9Day.csv
+│   ├── backtrack_20250208_0600_Forecast8Day.csv
+│   ├── backtrack_20250208_0615_Forecast7Day.csv
+│   ├── backtrack_20250208_0630_Forecast6Day.csv
+│   ├── backtrack_20250208_0645_Forecast5Day.csv
+│   ├── backtrack_20250208_0700_Forecast4Day.csv
+│   ├── backtrack_20250208_0715_Forecast3Day.csv
+│   ├── backtrack_20250208_0730_Forecast2Day.csv
+│   ├── backtrack_20250208_0745_Forecast1Day.csv
+│   ├── backtrack_20250209_0515_Forecast11Day.csv
+│   ├── backtrack_20250209_0530_Forecast10Day.csv
+│   ├── backtrack_20250209_0545_Forecast9Day.csv
+│   ├── backtrack_20250209_0600_Forecast8Day.csv
+│   ├── backtrack_20250209_0615_Forecast7Day.csv
+│   ├── backtrack_20250209_0630_Forecast6Day.csv
+│   ├── backtrack_20250209_0645_Forecast5Day.csv
+│   ├── backtrack_20250209_0700_Forecast4Day.csv
+│   ├── backtrack_20250209_0715_Forecast3Day.csv
+│   ├── backtrack_20250209_0730_Forecast2Day.csv
+│   ├── backtrack_20250209_0745_Forecast1Day.csv
+│   ├── backtrack_20250210_0515_Forecast11Day.csv
+│   ├── backtrack_20250210_0530_Forecast10Day.csv
+│   ├── backtrack_20250210_0545_Forecast9Day.csv
+│   ├── backtrack_20250210_0600_Forecast8Day.csv
+│   ├── backtrack_20250210_0615_Forecast7Day.csv
+│   ├── backtrack_20250210_0630_Forecast6Day.csv
+│   ├── backtrack_20250210_0645_Forecast5Day.csv
+│   ├── backtrack_20250210_0700_Forecast4Day.csv
+│   ├── backtrack_20250210_0715_Forecast3Day.csv
+│   ├── backtrack_20250210_0730_Forecast2Day.csv
+│   ├── backtrack_20250210_0745_Forecast1Day.csv
+│   ├── backtrack_20250211_0515_Forecast11Day.csv
+│   ├── backtrack_20250211_0530_Forecast10Day.csv
+│   ├── backtrack_20250211_0545_Forecast9Day.csv
+│   ├── backtrack_20250211_0600_Forecast8Day.csv
+│   ├── backtrack_20250211_0615_Forecast7Day.csv
+│   ├── backtrack_20250211_0630_Forecast6Day.csv
+│   ├── backtrack_20250211_0645_Forecast5Day.csv
+│   ├── backtrack_20250211_0700_Forecast4Day.csv
+│   ├── backtrack_20250211_0715_Forecast3Day.csv
+│   ├── backtrack_20250211_0730_Forecast2Day.csv
+│   ├── backtrack_20250211_0745_Forecast1Day.csv
+│   ├── backtrack_20250212_0515_Forecast11Day.csv
+│   ├── backtrack_20250212_0530_Forecast10Day.csv
+│   ├── backtrack_20250212_0545_Forecast9Day.csv
+│   ├── backtrack_20250212_0600_Forecast8Day.csv
+│   ├── backtrack_20250212_0615_Forecast7Day.csv
+│   ├── backtrack_20250212_0630_Forecast6Day.csv
+│   ├── backtrack_20250212_0645_Forecast5Day.csv
+│   ├── backtrack_20250212_0700_Forecast4Day.csv
+│   ├── backtrack_20250212_0715_Forecast3Day.csv
+│   ├── backtrack_20250212_0730_Forecast2Day.csv
+│   ├── backtrack_20250212_0745_Forecast1Day.csv
+│   ├── backtrack_20250213_0515_Forecast11Day.csv
+│   ├── backtrack_20250213_0530_Forecast10Day.csv
+│   ├── backtrack_20250213_0545_Forecast9Day.csv
+│   ├── backtrack_20250213_0600_Forecast8Day.csv
+│   ├── backtrack_20250213_0615_Forecast7Day.csv
+│   ├── backtrack_20250213_0630_Forecast6Day.csv
+│   ├── backtrack_20250213_0645_Forecast5Day.csv
+│   ├── backtrack_20250213_0700_Forecast4Day.csv
+│   ├── backtrack_20250213_0715_Forecast3Day.csv
+│   ├── backtrack_20250213_0730_Forecast2Day.csv
+│   ├── backtrack_20250213_0745_Forecast1Day.csv
+│   ├── backtrack_20250214_0515_Forecast11Day.csv
+│   ├── backtrack_20250214_0530_Forecast10Day.csv
+│   ├── backtrack_20250214_0545_Forecast9Day.csv
+│   ├── backtrack_20250214_0600_Forecast8Day.csv
+│   ├── backtrack_20250214_0615_Forecast7Day.csv
+│   ├── backtrack_20250214_0630_Forecast6Day.csv
+│   ├── backtrack_20250214_0645_Forecast5Day.csv
+│   ├── backtrack_20250214_0700_Forecast4Day.csv
+│   ├── backtrack_20250214_0715_Forecast3Day.csv
+│   ├── backtrack_20250214_0730_Forecast2Day.csv
+│   ├── backtrack_20250214_0745_Forecast1Day.csv
+│   ├── backtrack_20250215_0515_Forecast11Day.csv
+│   ├── backtrack_20250215_0530_Forecast10Day.csv
+│   ├── backtrack_20250215_0545_Forecast9Day.csv
+│   ├── backtrack_20250215_0600_Forecast8Day.csv
+│   ├── backtrack_20250215_0615_Forecast7Day.csv
+│   ├── backtrack_20250215_0630_Forecast6Day.csv
+│   ├── backtrack_20250215_0645_Forecast5Day.csv
+│   ├── backtrack_20250215_0700_Forecast4Day.csv
+│   ├── backtrack_20250215_0715_Forecast3Day.csv
+│   ├── backtrack_20250215_0730_Forecast2Day.csv
+│   ├── backtrack_20250215_0745_Forecast1Day.csv
+│   ├── backtrack_20250216_0515_Forecast11Day.csv
+│   ├── backtrack_20250216_0530_Forecast10Day.csv
+│   ├── backtrack_20250216_0545_Forecast9Day.csv
+│   ├── backtrack_20250216_0600_Forecast8Day.csv
+│   ├── backtrack_20250216_0615_Forecast7Day.csv
+│   ├── backtrack_20250216_0630_Forecast6Day.csv
+│   ├── backtrack_20250216_0645_Forecast5Day.csv
+│   ├── backtrack_20250216_0700_Forecast4Day.csv
+│   ├── backtrack_20250216_0715_Forecast3Day.csv
+│   ├── backtrack_20250216_0730_Forecast2Day.csv
+│   ├── backtrack_20250216_0745_Forecast1Day.csv
+│   ├── backtrack_20250217_0515_Forecast11Day.csv
+│   ├── backtrack_20250217_0530_Forecast10Day.csv
+│   ├── backtrack_20250217_0545_Forecast9Day.csv
+│   ├── backtrack_20250217_0600_Forecast8Day.csv
+│   ├── backtrack_20250217_0615_Forecast7Day.csv
+│   ├── backtrack_20250217_0630_Forecast6Day.csv
+│   ├── backtrack_20250217_0645_Forecast5Day.csv
+│   ├── backtrack_20250217_0700_Forecast4Day.csv
+│   ├── backtrack_20250217_0715_Forecast3Day.csv
+│   ├── backtrack_20250217_0730_Forecast2Day.csv
+│   ├── backtrack_20250217_0745_Forecast1Day.csv
+│   ├── backtrack_20250218_0515_Forecast11Day.csv
+│   ├── backtrack_20250218_0530_Forecast10Day.csv
+│   ├── backtrack_20250218_0700_Forecast4Day.csv
+│   ├── backtrack_20250218_0715_Forecast3Day.csv
+│   ├── backtrack_20250218_0730_Forecast2Day.csv
+│   ├── backtrack_20250218_0745_Forecast1Day.csv
+│   ├── Forecast4Hour.csv
+│   └── meta.csv
+├── resource
+│   ├── tower.csv
+│   └── weather.csv
+```
