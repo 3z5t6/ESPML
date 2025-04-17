@@ -53,7 +53,7 @@ def mkdir_if_not_exist(dir_path: Union[str, Path], mode: int = 0o775) -> bool:
         mode (int): 创建目录时设置的权限模式 (八进制)
 
     Returns:
-        bool: 如果成功创建或目录已存在,返回 True；否则返回 False
+        bool: 如果成功创建或目录已存在,返回 True;否则返回 False
     """
     path = Path(dir_path)
     if not path.exists():
@@ -86,7 +86,7 @@ def check_path_exists(path: Union[str, Path], path_type: Optional[str] = None, r
         raise_error (bool): 如果检查失败,是否引发异常
 
     Returns:
-        bool: 如果检查通过,返回 True；否则返回 False (除非 raise_error=True)
+        bool: 如果检查通过,返回 True;否则返回 False (除非 raise_error=True)
 
     Raises:
         FileNotFoundError: 如果 raise_error=True 且路径不存在
@@ -128,7 +128,7 @@ def safe_remove(path: Union[str, Path], ignore_errors: bool = True) -> bool:
         ignore_errors (bool): 是否忽略删除过程中发生的错误
 
     Returns:
-        bool: 如果成功删除或路径不存在,返回 True；否则返回 False
+        bool: 如果成功删除或路径不存在,返回 True;否则返回 False
     """
     p = Path(path)
     try:
@@ -174,8 +174,6 @@ def list_files_in_dir(dir_path: Union[str, Path], pattern: str = '*', recursive:
         files = [f for f in file_generator if f.is_file()]
 
         if full_path:
-             # glob 默认返回相对路径（如果 p 是相对的）或绝对路径（如果 p 是绝对的）
-             # 确保返回绝对路径
              files = [f.resolve() for f in files]
 
         logger.debug(f"在 '{p}' 中找到 {len(files)} 个匹配 '{pattern}' 的文件 (recursive={recursive})")
@@ -204,7 +202,6 @@ def get_file_size(file_path: Union[str, Path], human_readable: bool = False) -> 
         check_path_exists(p, path_type='f', raise_error=True)
         size_bytes = p.stat().st_size
         if human_readable:
-            # 转换为易读格式 (KB, MB, GB)
             if size_bytes < 1024:
                 return f"{size_bytes} B"
             elif size_bytes < 1024**2:
@@ -221,7 +218,7 @@ def get_file_size(file_path: Union[str, Path], human_readable: bool = False) -> 
         logger.error(f"获取文件大小失败: {p} - {e}")
         return None
 
-# --- 压缩/解压文件 (推断) ---
+# --- 压缩/解压文件 ---
 
 def compress_file(input_path: Union[str, Path], output_path: Union[str, Path], compression: str = 'gzip', level: int = 9) -> bool:
     """压缩单个文件"""
@@ -276,10 +273,7 @@ def decompress_file(input_path: Union[str, Path], output_dir: Union[str, Path], 
         elif comp_lower == 'zip':
             with zipfile.ZipFile(in_p, 'r') as zf:
                  zf.extractall(path=out_d) # 解压 zip 包内所有文件到目录
-                 # 如果 zip 包只有一个文件且名称与压缩包不同,这里的 output_path 可能不准确
-                 # 需要更复杂的逻辑来确定解压后的确切文件名
                  logger.warning(f"解压 ZIP 文件 '{in_p}' 到目录 '{out_d}',具体文件名取决于包内容")
-                 # 此处简单假设解压成功即可
         elif comp_lower == 'tar':
              with tarfile.open(in_p, 'r') as tf:
                   tf.extractall(path=out_d)
@@ -309,7 +303,7 @@ def read_json_file(file_path: Union[str, Path], encoding: str = DEFAULT_ENCODING
     try:
         with open(path, 'r', encoding=encoding) as f:
             data = json.load(f, **kwargs)
-        # logger.debug(f"成功读取 JSON 文件: {path}")
+        logger.debug(f"成功读取 JSON 文件: {path}")
         return data
     except json.JSONDecodeError as e:
         logger.error(f"解析 JSON 文件失败: {path} - {e}", exc_info=True)
@@ -325,7 +319,7 @@ def write_json_file(data: Any, file_path: Union[str, Path], encoding: str = DEFA
     try:
         with open(path, 'w', encoding=encoding) as f:
             json.dump(data, f, ensure_ascii=ensure_ascii, indent=indent, **kwargs)
-        # logger.debug(f"成功写入 JSON 文件: {path}")
+        logger.debug(f"成功写入 JSON 文件: {path}")
         return True
     except TypeError as e:
          logger.error(f"写入 JSON 失败数据包含无法序列化的类型 - {e}", exc_info=True)
@@ -342,10 +336,8 @@ def load_pickle(file_path: Union[str, Path], **kwargs) -> Optional[Any]:
     path = Path(file_path)
     try:
         with open(path, 'rb') as f:
-            # 添加 encoding='latin1' 或 'bytes' 可能解决一些版本兼容问题
-            # 但需要小心,最好确保保存和加载使用兼容的 Python 版本和库版本
             obj = pickle.load(f, **kwargs)
-        # logger.debug(f"成功加载 Pickle 文件: {path}")
+        logger.debug(f"成功加载 Pickle 文件: {path}")
         return obj
     except pickle.UnpicklingError as e:
         logger.error(f"加载 Pickle 文件失败 (文件可能已损坏或不兼容): {path} - {e}", exc_info=True)
@@ -364,7 +356,7 @@ def dump_pickle(obj: Any, file_path: Union[str, Path], protocol: int = pickle.HI
     try:
         with open(path, 'wb') as f:
             pickle.dump(obj, f, protocol=protocol, **kwargs)
-        # logger.debug(f"成功保存 Pickle 文件: {path}")
+        logger.debug(f"成功保存 Pickle 文件: {path}")
         return True
     except pickle.PicklingError as e:
         logger.error(f"保存 Pickle 文件失败 (对象可能无法序列化): {path} - {e}", exc_info=True)
@@ -502,7 +494,7 @@ def parse_datetime_flexible(
             continue # 尝试下一种格式
 
     if parsed_dt is None:
-        # 如果所有格式都失败,尝试让 pandas 自动推断（可能较慢）
+        # 如果所有格式都失败,尝试让 pandas 自动推断
         try:
             parsed_dt = pd.to_datetime(datetime_str)
             if isinstance(parsed_dt, pd.Timestamp):
@@ -529,15 +521,10 @@ def parse_datetime_flexible(
              return default
 
         if parsed_dt.tzinfo is None:
-            # 如果解析出的是 naive datetime,假定它是目标时区（或 UTC? 需要业务逻辑确定）
-            # 普遍做法是先 localize 到某个默认时区（如本地或 UTC）,再转换
-            # 简单处理直接附加目标时区 (不推荐,除非明确知道字符串就是目标时区)
             # parsed_dt = target_tz.localize(parsed_dt)
-            # 更安全的做法是要求输入带时区信息或指定时区
             logger.warning(f"解析得到的 datetime 是 naive 的,但指定了目标时区 {tz}无法安全地进行时区转换返回 naive datetime")
             # return default
         else:
-            # 如果解析出的是 aware datetime,转换到目标时区
             try:
                 parsed_dt = parsed_dt.astimezone(target_tz)
             except Exception as e:
@@ -696,7 +683,7 @@ class TimerContext(ContextManager[None]):
         else:
             self.logger.warning(f"计时器 '{self.name}' 未正确启动")
 
-# --- 并行处理 (示例,可能需要根据原代码调整) ---
+# --- 并行处理可能需要调整 ---
 
 # def parallel_map(func: Callable[[Any], Any], items: Iterable[Any], n_workers: int = -1, mode: str = 'process', chunksize: int = 1) -> List[Any]:
 #     """
@@ -765,15 +752,15 @@ def is_running_in_notebook() -> bool:
         # 这个检查在标准 Python 解释器中会失败
         shell = pd.get_option('shell')
         if shell == 'ZMQInteractiveShell':
-            return True   # Jupyter notebook or qtconsole
+            return True
         elif shell == 'TerminalInteractiveShell':
-            return False  # Terminal running IPython
+            return False
         else:
-            return False  # Other type (?)
+            return False
     except NameError:
-        return False      # Probably standard Python interpreter
+        return False
 
-def suppress_warnings(category: Warning = Warning) -> Callable[[Callable[..., T]], Callable[..., T]]:
+def suppress_warnings(category: Optional[Warning] = Warning) -> Callable[[Callable[..., T]], Callable[..., T]]:
      """装饰器抑制特定类别的警告"""
      def decorator(func: Callable[..., T]) -> Callable[..., T]:
          @functools.wraps(func)

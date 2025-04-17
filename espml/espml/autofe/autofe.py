@@ -13,7 +13,7 @@ from loguru._logger import Logger as LoguruLoggerType
 from typing import Optional, Tuple, List, Dict, Any, Set
 
 # 导入所需的内部模块 (路径适配为 espml)
-from espml.autofe.transform import Transform # 导入用户提供的 Transform 类
+from espml.autofe.transform import Transform # 导入用户的 Transform 类
 from espml.autofe import utils as autofe_utils # 导入整个utils模块作为autofe_utils
 from espml.autofe.utils import feature_space, update_time_span # 导入 autofe.utils 函数
 from espml.autofe.algorithm import ( # 导入 algorithm 中的核心函数
@@ -21,7 +21,7 @@ from espml.autofe.algorithm import ( # 导入 algorithm 中的核心函数
     max_threads_name2feature,
     threads_feature_select
 )
-# 导入项目级通用工具 (如果需要)
+# 导入项目级通用工具
 from espml.util import utils as common_utils
 
 class AutoFE:

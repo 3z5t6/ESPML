@@ -118,7 +118,7 @@ FORECAST_HORIZONS_PD = {
     "10Day": pd.Timedelta(days=10),
     "11Day": pd.Timedelta(days=11),
 }
-# 从 horizon 字符串 (如 "4Hour") 获取预测点数 (假设频率为 DEFAULT_TIME_FREQ)
+
 def get_horizon_steps(horizon_key: str, freq: str = DEFAULT_TIME_FREQ) -> Optional[int]:
     """根据 Horizon Key 和时间频率计算预测步数"""
     timedelta = FORECAST_HORIZONS_PD.get(horizon_key)
