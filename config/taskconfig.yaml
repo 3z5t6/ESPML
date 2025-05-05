@@ -1,0 +1,120 @@
+DataSource:
+  WeatherForecast:
+  - data/resource/weather.csv
+  WindFans: []
+  WindTower:
+  - data/resource/tower.csv
+  dir: data/resource/
+Feature:
+  AheadRows: 0
+  AutoFEmaxTrialNum: 5
+  AutoMLTimeBudget: 300
+  CategoricalFeature: []
+  DaySubmitLagTime: 0hour
+  FeatureName: []
+  HourSubmitLagTime: 0min
+  IgnoreFeature: []
+  Metric: r2
+  PredictWaiting: 0
+  TargetName: power
+  TaskType: regression
+  TestSize: 0.2
+  TimeFrequency: 15min
+  TimeIndex: datetime
+  TrainSize: 500000
+  WeatherMergeDays: 2
+  WeatherPreDateIndex: PRE_DATE
+  WeatherPreTimeIndex: PRE_TIME
+  WeatherSCDateIndex: SC_DATE
+  WeatherSCTimeIndex: SC_TIME
+Path:
+  LogFile: data/logs
+  Model: data/model
+  OtherFile: data/ml
+  Prediction: data/pred
+Task:
+  Forecast10Day:
+    RowInterval: 960
+    SubmitTime:
+    - 08:00
+    TimeInterval: 10day
+    TrainTime:
+    - 05:30
+  Forecast1Day:
+    RowInterval: 96
+    SubmitTime:
+    - 08:00
+    TimeInterval: 1day
+    TrainTime:
+    - 07:45
+  Forecast2Day:
+    RowInterval: 192
+    SubmitTime:
+    - 08:00
+    TimeInterval: 2day
+    TrainTime:
+    - 07:30
+  Forecast3Day:
+    RowInterval: 288
+    SubmitTime:
+    - 08:00
+    TimeInterval: 3day
+    TrainTime:
+    - 07:15
+  Forecast4Day:
+    RowInterval: 384
+    SubmitTime:
+    - 08:00
+    TimeInterval: 4day
+    TrainTime:
+    - 07:00
+  Forecast4Hour:
+    RowInterval: 16
+    SubmitTime:
+    - :00
+    - :15
+    - :30
+    - :45
+    TimeInterval: 4hour
+    TrainTime:
+    - 00:00
+    - 04:00
+    - 08:00
+    - '12:00'
+    - '16:00'
+    - '20:00'
+  Forecast5Day:
+    RowInterval: 480
+    SubmitTime:
+    - 08:00
+    TimeInterval: 5day
+    TrainTime:
+    - 06:45
+  Forecast6Day:
+    RowInterval: 576
+    SubmitTime:
+    - 08:00
+    TimeInterval: 6day
+    TrainTime:
+    - 06:30
+  Forecast7Day:
+    RowInterval: 672
+    SubmitTime:
+    - 08:00
+    TimeInterval: 7day
+    TrainTime:
+    - 06:15
+  Forecast8Day:
+    RowInterval: 768
+    SubmitTime:
+    - 08:00
+    TimeInterval: 8day
+    TrainTime:
+    - 06:00
+  Forecast9Day:
+    RowInterval: 864
+    SubmitTime:
+    - 08:00
+    TimeInterval: 9day
+    TrainTime:
+    - 05:45
